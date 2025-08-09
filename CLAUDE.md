@@ -36,7 +36,7 @@
 - Document the whole plan and all steps in-detail and document your current implementation status after each change
     -- create a readme.md file covering all important topics
     -- create a visual overview of all files of the project and and indicate how they act with each other for a great overview
-    -- create an architecture plan file
+    -- create an architecture plan file where you include mermaid diagrams
     -- create an error handling file as described above
     -- create a permissions file listing all permissions necessary and the usecase for them with a detailed description. Also add where in the code this is used
 - Use only production-ready code, components and libraries as we have only one environment
