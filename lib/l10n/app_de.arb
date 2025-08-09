@@ -1,0 +1,288 @@
+{
+  "@@locale": "de",
+  
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "appTitle": "MyFriends",
+  
+  "@welcomeTitle": {
+    "description": "Welcome message on home screen"
+  },
+  "welcomeTitle": "Willkommen bei MyFriends",
+  
+  "@welcomeSubtitle": {
+    "description": "Subtitle on home screen"
+  },
+  "welcomeSubtitle": "Behalte alle besonderen Menschen im Blick",
+  
+  "@addFriend": {
+    "description": "Add friend button text"
+  },
+  "addFriend": "Neuen Freund hinzufügen",
+  
+  "@myFriends": {
+    "description": "My friends button/title"
+  },
+  "myFriends": "Meine Freunde",
+  
+  "@quickAdd": {
+    "description": "Quick add tooltip"
+  },
+  "quickAdd": "Freund hinzufügen",
+  
+  "@comingSoon": {
+    "description": "Coming soon message"
+  },
+  "comingSoon": "Demnächst verfügbar",
+  
+  "@name": {
+    "description": "Name field label"
+  },
+  "name": "Name",
+  
+  "@nickname": {
+    "description": "Nickname field label"
+  },
+  "nickname": "Spitzname",
+  
+  "@location": {
+    "description": "Location field label"
+  },
+  "location": "Ort",
+  
+  "@firstMet": {
+    "description": "First met label"
+  },
+  "firstMet": "Erstes Treffen",
+  
+  "@birthday": {
+    "description": "Birthday field label"
+  },
+  "birthday": "Geburtstag",
+  
+  "@phone": {
+    "description": "Phone field label"
+  },
+  "phone": "Telefon",
+  
+  "@email": {
+    "description": "Email field label"
+  },
+  "email": "E-Mail",
+  
+  "@notes": {
+    "description": "Notes field label"
+  },
+  "notes": "Notizen",
+  
+  "@save": {
+    "description": "Save button text"
+  },
+  "save": "Speichern",
+  
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "cancel": "Abbrechen",
+  
+  "@delete": {
+    "description": "Delete button text"
+  },
+  "delete": "Löschen",
+  
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "edit": "Bearbeiten",
+  
+  "@search": {
+    "description": "Search placeholder"
+  },
+  "search": "Suchen...",
+  
+  "@noFriendsYet": {
+    "description": "Empty state message"
+  },
+  "noFriendsYet": "Noch keine Freunde hinzugefügt",
+  
+  "@addYourFirstFriend": {
+    "description": "Empty state call to action"
+  },
+  "addYourFirstFriend": "Füge deinen ersten Freund hinzu!",
+  
+  "@takePhoto": {
+    "description": "Take photo button"
+  },
+  "takePhoto": "Foto aufnehmen",
+  
+  "@chooseFromGallery": {
+    "description": "Choose from gallery button"
+  },
+  "chooseFromGallery": "Aus Galerie wählen",
+  
+  "@currentLocation": {
+    "description": "Current location button"
+  },
+  "currentLocation": "Aktueller Standort",
+  
+  "@enterManually": {
+    "description": "Enter location manually"
+  },
+  "enterManually": "Manuell eingeben",
+  
+  "@requiredField": {
+    "description": "Required field validation message"
+  },
+  "requiredField": "Dieses Feld ist erforderlich",
+  
+  "@invalidEmail": {
+    "description": "Invalid email validation message"
+  },
+  "invalidEmail": "Ungültige E-Mail-Adresse",
+  
+  "@invalidPhone": {
+    "description": "Invalid phone validation message"
+  },
+  "invalidPhone": "Ungültige Telefonnummer",
+  
+  "@friendSaved": {
+    "description": "Friend saved success message"
+  },
+  "friendSaved": "Freund erfolgreich gespeichert",
+  
+  "@friendDeleted": {
+    "description": "Friend deleted message"
+  },
+  "friendDeleted": "Freund wurde gelöscht",
+  
+  "@errorSavingFriend": {
+    "description": "Error saving friend"
+  },
+  "errorSavingFriend": "Fehler beim Speichern des Freundes",
+  
+  "@confirmDelete": {
+    "description": "Confirm delete dialog title"
+  },
+  "confirmDelete": "Löschen bestätigen",
+  
+  "@confirmDeleteMessage": {
+    "description": "Confirm delete dialog message"
+  },
+  "confirmDeleteMessage": "Möchtest du diesen Freund wirklich löschen?",
+  
+  "@yes": {
+    "description": "Yes button"
+  },
+  "yes": "Ja",
+  
+  "@no": {
+    "description": "No button"
+  },
+  "no": "Nein",
+  
+  "@settings": {
+    "description": "Settings title"
+  },
+  "settings": "Einstellungen",
+  
+  "@language": {
+    "description": "Language setting"
+  },
+  "language": "Sprache",
+  
+  "@darkMode": {
+    "description": "Dark mode setting"
+  },
+  "darkMode": "Dunkler Modus",
+  
+  "@about": {
+    "description": "About section"
+  },
+  "about": "Über",
+  
+  "@version": {
+    "description": "Version label"
+  },
+  "version": "Version",
+  
+  "@privacyPolicy": {
+    "description": "Privacy policy link"
+  },
+  "privacyPolicy": "Datenschutzrichtlinie",
+  
+  "@termsOfService": {
+    "description": "Terms of service link"
+  },
+  "termsOfService": "Nutzungsbedingungen",
+  
+  "@friendBooks": {
+    "description": "Friend books/groups"
+  },
+  "friendBooks": "Freundesbücher",
+  
+  "@createFriendBook": {
+    "description": "Create friend book button"
+  },
+  "createFriendBook": "Neues Freundesbuch",
+  
+  "@friendBookName": {
+    "description": "Friend book name field"
+  },
+  "friendBookName": "Name des Freundesbuchs",
+  
+  "@iLike": {
+    "description": "I like field label"
+  },
+  "iLike": "Ich mag",
+  
+  "@iDontLike": {
+    "description": "I don't like field label"
+  },
+  "iDontLike": "Ich mag nicht",
+  
+  "@hobbies": {
+    "description": "Hobbies field label"
+  },
+  "hobbies": "Hobbys",
+  
+  "@favoriteColor": {
+    "description": "Favorite color field"
+  },
+  "favoriteColor": "Lieblingsfarbe",
+  
+  "@homeLocation": {
+    "description": "Home location field"
+  },
+  "homeLocation": "Wohnort",
+  
+  "@work": {
+    "description": "Work/occupation field"
+  },
+  "work": "Beruf",
+  
+  "@socialMedia": {
+    "description": "Social media field"
+  },
+  "socialMedia": "Social Media",
+  
+  "@classicTemplate": {
+    "description": "Classic template name"
+  },
+  "classicTemplate": "Klassisch",
+  
+  "@modernTemplate": {
+    "description": "Modern template name"
+  },
+  "modernTemplate": "Modern",
+  
+  "@customTemplate": {
+    "description": "Custom template name"
+  },
+  "customTemplate": "Benutzerdefiniert",
+  
+  "@selectTemplate": {
+    "description": "Select template prompt"
+  },
+  "selectTemplate": "Vorlage auswählen"
+}

@@ -1,0 +1,180 @@
+// Friend model for data layer
+// 
+// Handles serialization and Hive storage
+
+import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
+import '../../domain/entities/friend.dart';
+
+part 'friend_model.g.dart';
+
+/// Friend model for data persistence
+@HiveType(typeId: 0)
+@JsonSerializable()
+class FriendModel extends HiveObject {
+  @HiveField(0)
+  final String id;
+  
+  @HiveField(1)
+  final String name;
+  
+  @HiveField(2)
+  final String? nickname;
+  
+  @HiveField(3)
+  final String? photoPath;
+  
+  @HiveField(4)
+  final String? firstMetLocation;
+  
+  @HiveField(5)
+  final double? firstMetLatitude;
+  
+  @HiveField(6)
+  final double? firstMetLongitude;
+  
+  @HiveField(7)
+  final DateTime firstMetDate;
+  
+  @HiveField(8)
+  final DateTime? birthday;
+  
+  @HiveField(9)
+  final String? phone;
+  
+  @HiveField(10)
+  final String? email;
+  
+  @HiveField(11)
+  final String? homeLocation;
+  
+  @HiveField(12)
+  final String? work;
+  
+  @HiveField(13)
+  final String? likes;
+  
+  @HiveField(14)
+  final String? dislikes;
+  
+  @HiveField(15)
+  final String? hobbies;
+  
+  @HiveField(16)
+  final String? favoriteColor;
+  
+  @HiveField(17)
+  final String? socialMedia;
+  
+  @HiveField(18)
+  final String? notes;
+  
+  @HiveField(19)
+  final String templateType;
+  
+  @HiveField(20)
+  final List<String> friendBookIds;
+  
+  @HiveField(21)
+  final bool isFavorite;
+  
+  @HiveField(22)
+  final DateTime createdAt;
+  
+  @HiveField(23)
+  final DateTime updatedAt;
+  
+  FriendModel({
+    required this.id,
+    required this.name,
+    this.nickname,
+    this.photoPath,
+    this.firstMetLocation,
+    this.firstMetLatitude,
+    this.firstMetLongitude,
+    required this.firstMetDate,
+    this.birthday,
+    this.phone,
+    this.email,
+    this.homeLocation,
+    this.work,
+    this.likes,
+    this.dislikes,
+    this.hobbies,
+    this.favoriteColor,
+    this.socialMedia,
+    this.notes,
+    required this.templateType,
+    required this.friendBookIds,
+    required this.isFavorite,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  
+  /// Creates a FriendModel from a Friend entity
+  factory FriendModel.fromEntity(Friend friend) {
+    return FriendModel(
+      id: friend.id,
+      name: friend.name,
+      nickname: friend.nickname,
+      photoPath: friend.photoPath,
+      firstMetLocation: friend.firstMetLocation,
+      firstMetLatitude: friend.firstMetLatitude,
+      firstMetLongitude: friend.firstMetLongitude,
+      firstMetDate: friend.firstMetDate,
+      birthday: friend.birthday,
+      phone: friend.phone,
+      email: friend.email,
+      homeLocation: friend.homeLocation,
+      work: friend.work,
+      likes: friend.likes,
+      dislikes: friend.dislikes,
+      hobbies: friend.hobbies,
+      favoriteColor: friend.favoriteColor,
+      socialMedia: friend.socialMedia,
+      notes: friend.notes,
+      templateType: friend.templateType,
+      friendBookIds: friend.friendBookIds,
+      isFavorite: friend.isFavorite,
+      createdAt: friend.createdAt,
+      updatedAt: friend.updatedAt,
+    );
+  }
+  
+  /// Converts this FriendModel to a Friend entity
+  Friend toEntity() {
+    return Friend(
+      id: id,
+      name: name,
+      nickname: nickname,
+      photoPath: photoPath,
+      firstMetLocation: firstMetLocation,
+      firstMetLatitude: firstMetLatitude,
+      firstMetLongitude: firstMetLongitude,
+      firstMetDate: firstMetDate,
+      birthday: birthday,
+      phone: phone,
+      email: email,
+      homeLocation: homeLocation,
+      work: work,
+      likes: likes,
+      dislikes: dislikes,
+      hobbies: hobbies,
+      favoriteColor: favoriteColor,
+      socialMedia: socialMedia,
+      notes: notes,
+      templateType: templateType,
+      friendBookIds: friendBookIds,
+      isFavorite: isFavorite,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+  
+  /// Creates a FriendModel from JSON
+  factory FriendModel.fromJson(Map<String, dynamic> json) => 
+    _$FriendModelFromJson(json);
+  
+  /// Converts this FriendModel to JSON
+  Map<String, dynamic> toJson() => _$FriendModelToJson(this);
+}

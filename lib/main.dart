@@ -5,15 +5,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/theme/app_theme.dart';
+import 'core/services/database_service.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Hive for local storage
-  await Hive.initFlutter();
+  // Initialize database
+  await DatabaseService.initialize();
   
   // Run the app with Riverpod provider scope
   runApp(
@@ -38,6 +40,19 @@ class MyFriendsApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system, // Follow system theme
       
+      // Localization
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('de'), // German - Primary
+        Locale('en'), // English
+      ],
+      locale: const Locale('de'), // Default to German
+      
       // Start with home page
       home: const HomePage(),
     );
@@ -50,9 +65,11 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MyFriends'),
+        title: Text(l10n.appTitle),
       ),
       body: Center(
         child: Column(
@@ -68,7 +85,7 @@ class HomePage extends StatelessWidget {
             
             // Welcome text
             Text(
-              'Willkommen bei MyFriends',
+              l10n.welcomeTitle,
               style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
@@ -76,7 +93,7 @@ class HomePage extends StatelessWidget {
             
             // Subtitle
             Text(
-              'Behalte alle besonderen Menschen im Blick',
+              l10n.welcomeSubtitle,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -89,13 +106,13 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 // TODO: Navigate to add friend page
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Freund hinzufügen - Coming Soon'),
+                  SnackBar(
+                    content: Text('${l10n.addFriend} - ${l10n.comingSoon}'),
                   ),
                 );
               },
               icon: const Icon(Icons.person_add),
-              label: const Text('Neuen Freund hinzufügen'),
+              label: Text(l10n.addFriend),
             ),
             const SizedBox(height: 16),
             
@@ -103,13 +120,13 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 // TODO: Navigate to friends list
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Freundesliste - Coming Soon'),
+                  SnackBar(
+                    content: Text('${l10n.myFriends} - ${l10n.comingSoon}'),
                   ),
                 );
               },
               icon: const Icon(Icons.list),
-              label: const Text('Meine Freunde'),
+              label: Text(l10n.myFriends),
             ),
           ],
         ),
@@ -120,12 +137,12 @@ class HomePage extends StatelessWidget {
         onPressed: () {
           // TODO: Quick add friend
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Quick Add - Coming Soon'),
+            SnackBar(
+              content: Text('${l10n.quickAdd} - ${l10n.comingSoon}'),
             ),
           );
         },
-        tooltip: 'Freund hinzufügen',
+        tooltip: l10n.quickAdd,
         child: const Icon(Icons.add),
       ),
     );
