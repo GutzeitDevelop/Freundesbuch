@@ -78,6 +78,16 @@ class HomePage extends StatelessWidget {
               icon: const Icon(Icons.book),
               label: Text(l10n.friendBooks),
             ),
+            const SizedBox(height: 16),
+            
+            OutlinedButton.icon(
+              onPressed: () {
+                // Navigate to template management
+                context.go(AppRouter.templateManagement);
+              },
+              icon: const Icon(Icons.dashboard_customize),
+              label: const Text('Templates verwalten'),
+            ),
           ],
         ),
       ),

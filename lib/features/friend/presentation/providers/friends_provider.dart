@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/friend.dart';
 import '../../domain/repositories/friend_repository.dart';
 import '../../data/repositories/friend_repository_impl.dart';
+import '../../../friendbook/presentation/providers/friend_books_provider.dart';
 
 /// Provider for friend repository
 final friendRepositoryProvider = Provider<FriendRepository>((ref) {
@@ -46,13 +47,23 @@ class FriendsNotifier extends StateNotifier<AsyncValue<List<Friend>>> {
     }
   }
   
-  /// Deletes a friend
-  Future<void> deleteFriend(String friendId) async {
+  /// Deletes a friend and returns the deleted friend data
+  Future<Friend?> deleteFriend(String friendId) async {
     try {
+      // Get the friend to know which books they belong to
+      final friend = await getFriendById(friendId);
+      
+      // Delete the friend
       await _repository.deleteFriend(friendId);
-      await loadFriends(); // Reload list
+      
+      // Reload list
+      await loadFriends();
+      
+      // Return the friend so caller can handle book updates
+      return friend;
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
+      return null;
     }
   }
   

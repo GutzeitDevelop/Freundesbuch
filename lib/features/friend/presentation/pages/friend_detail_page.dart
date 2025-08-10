@@ -65,7 +65,17 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
     );
     
     if (confirmed == true && mounted) {
-      await ref.read(friendsProvider.notifier).deleteFriend(widget.friendId);
+      // Delete friend and get the friend data
+      final deletedFriend = await ref.read(friendsProvider.notifier).deleteFriend(widget.friendId);
+      
+      // Update all friend books that contained this friend
+      if (deletedFriend != null) {
+        for (final bookId in deletedFriend.friendBookIds) {
+          await ref.read(friendBooksProvider.notifier).removeFriendFromBook(bookId, widget.friendId);
+          // Invalidate the friend count for this book
+          ref.invalidate(friendCountInBookProvider(bookId));
+        }
+      }
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

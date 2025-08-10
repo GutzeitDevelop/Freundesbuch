@@ -5,6 +5,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../features/friend/data/models/friend_model.dart';
 import '../../features/friendbook/data/models/friend_book_model.dart';
+import '../../features/template/data/models/template_model.dart';
 
 /// Service for managing database initialization
 class DatabaseService {
@@ -36,6 +37,11 @@ class DatabaseService {
     // Register FriendBookModel adapter if not already registered
     if (!Hive.isAdapterRegistered(1)) {
       Hive.registerAdapter(FriendBookModelAdapter());
+    }
+    
+    // Register TemplateModel adapter if not already registered
+    if (!Hive.isAdapterRegistered(2)) {
+      Hive.registerAdapter(TemplateModelAdapter());
     }
   }
   

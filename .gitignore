@@ -83,3 +83,9 @@ coverage/
 .env.development
 .env.staging
 .env.production
+
+# Test data files - should never be committed
+*.hive
+*.lock
+test_data_*/
+hive_test_*/

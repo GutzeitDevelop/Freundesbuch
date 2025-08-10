@@ -13,6 +13,7 @@ import '../../domain/entities/friend_template.dart';
 import '../providers/friends_provider.dart';
 import '../../../friendbook/presentation/providers/friend_books_provider.dart';
 import '../../../friendbook/domain/entities/friend_book.dart';
+import '../../../template/presentation/providers/template_provider.dart';
 
 /// Page for adding or editing a friend
 class AddFriendPage extends ConsumerStatefulWidget {
@@ -63,6 +64,27 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   void _loadFriend() async {
     final friend = await ref.read(friendsProvider.notifier).getFriendById(widget.friendId!);
     if (friend != null && mounted) {
+      // Check if the template still exists
+      String templateToUse = friend.templateType;
+      final templatesAsync = ref.read(templateProvider);
+      if (templatesAsync.hasValue) {
+        final templates = templatesAsync.value!;
+        final templateExists = templates.any((t) => t.id == friend.templateType);
+        if (!templateExists) {
+          // Template was deleted, fallback to classic
+          templateToUse = 'classic';
+          // Show a message to the user
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Das ursprüngliche Template wurde gelöscht. Klassisches Template wird verwendet.'),
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+        }
+      }
+      
       setState(() {
         _existingFriend = friend;
         _nameController.text = friend.name;
@@ -84,7 +106,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         _latitude = friend.firstMetLatitude;
         _longitude = friend.firstMetLongitude;
         _isFavorite = friend.isFavorite;
-        _selectedTemplate = friend.templateType;
+        _selectedTemplate = templateToUse;
         _selectedFriendBookIds = List<String>.from(friend.friendBookIds);
       });
     }
@@ -180,26 +202,102 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   
   Widget _buildTemplateSelector() {
     final l10n = AppLocalizations.of(context)!;
+    final templatesAsync = ref.watch(templateProvider);
     
-    return SegmentedButton<String>(
-      segments: [
-        ButtonSegment(
-          value: 'classic',
-          label: Text(l10n.classicTemplate),
-          icon: const Icon(Icons.book),
-        ),
-        ButtonSegment(
-          value: 'modern',
-          label: Text(l10n.modernTemplate),
-          icon: const Icon(Icons.smartphone),
-        ),
-      ],
-      selected: {_selectedTemplate},
-      onSelectionChanged: (Set<String> selection) {
-        setState(() {
-          _selectedTemplate = selection.first;
-        });
+    return templatesAsync.when(
+      data: (templates) {
+        // If there are custom templates, show a dropdown instead of segmented button
+        if (templates.length > 2) {
+          // Ensure the selected template exists in the list
+          final templateExists = templates.any((t) => t.id == _selectedTemplate);
+          if (!templateExists && _selectedTemplate != 'classic') {
+            // Update the state to use classic template
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _selectedTemplate = 'classic';
+                });
+              }
+            });
+          }
+          final valueToUse = templateExists ? _selectedTemplate : 'classic';
+          
+          return DropdownButtonFormField<String>(
+            value: valueToUse,
+            decoration: InputDecoration(
+              labelText: l10n.selectTemplate,
+              prefixIcon: const Icon(Icons.dashboard_customize),
+              border: const OutlineInputBorder(),
+            ),
+            items: templates.map((template) {
+              return DropdownMenuItem(
+                value: template.id,
+                child: Row(
+                  children: [
+                    Icon(
+                      template.isCustom ? Icons.dashboard_customize : Icons.lock,
+                      size: 18,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(template.name),
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _selectedTemplate = value;
+                });
+              }
+            },
+          );
+        }
+        
+        // If only predefined templates, show segmented button
+        return SegmentedButton<String>(
+          segments: [
+            ButtonSegment(
+              value: 'classic',
+              label: Text(l10n.classicTemplate),
+              icon: const Icon(Icons.book),
+            ),
+            ButtonSegment(
+              value: 'modern',
+              label: Text(l10n.modernTemplate),
+              icon: const Icon(Icons.smartphone),
+            ),
+          ],
+          selected: {_selectedTemplate},
+          onSelectionChanged: (Set<String> selection) {
+            setState(() {
+              _selectedTemplate = selection.first;
+            });
+          },
+        );
       },
+      loading: () => const CircularProgressIndicator(),
+      error: (_, __) => SegmentedButton<String>(
+        segments: [
+          ButtonSegment(
+            value: 'classic',
+            label: Text(l10n.classicTemplate),
+            icon: const Icon(Icons.book),
+          ),
+          ButtonSegment(
+            value: 'modern',
+            label: Text(l10n.modernTemplate),
+            icon: const Icon(Icons.smartphone),
+          ),
+        ],
+        selected: {_selectedTemplate},
+        onSelectionChanged: (Set<String> selection) {
+          setState(() {
+            _selectedTemplate = selection.first;
+          });
+        },
+      ),
     );
   }
   
@@ -321,9 +419,22 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   
   List<Widget> _buildFormFields() {
     final l10n = AppLocalizations.of(context)!;
-    final template = _selectedTemplate == 'modern' 
-        ? FriendTemplate.modern() 
-        : FriendTemplate.classic();
+    
+    // Get the template from provider
+    final templatesAsync = ref.watch(templateProvider);
+    FriendTemplate? template;
+    
+    if (templatesAsync.hasValue) {
+      template = templatesAsync.value!.firstWhere(
+        (t) => t.id == _selectedTemplate,
+        orElse: () => FriendTemplate.classic(),
+      );
+    } else {
+      // Fallback to predefined templates
+      template = _selectedTemplate == 'modern' 
+          ? FriendTemplate.modern() 
+          : FriendTemplate.classic();
+    }
     
     final widgets = <Widget>[];
     

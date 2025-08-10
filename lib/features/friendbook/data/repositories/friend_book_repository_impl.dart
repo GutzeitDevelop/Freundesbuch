@@ -108,7 +108,32 @@ class FriendBookRepositoryImpl implements FriendBookRepository {
   Future<int> getFriendCountInBook(String bookId) async {
     final box = await _openBox();
     final model = box.get(bookId);
-    return model?.friendIds.length ?? 0;
+    if (model == null) return 0;
+    
+    // Count only friends that actually exist
+    if (!Hive.isBoxOpen('friends')) {
+      await Hive.openBox<FriendModel>('friends');
+    }
+    final friendsBox = Hive.box<FriendModel>('friends');
+    
+    int count = 0;
+    for (final friendId in model.friendIds) {
+      if (friendsBox.containsKey(friendId)) {
+        count++;
+      }
+    }
+    
+    // Clean up the friendIds list if there are orphaned IDs
+    if (count != model.friendIds.length) {
+      final existingFriendIds = model.friendIds.where((id) => friendsBox.containsKey(id)).toList();
+      final updatedModel = model.copyWith(
+        friendIds: existingFriendIds,
+        updatedAt: DateTime.now(),
+      );
+      await box.put(bookId, updatedModel);
+    }
+    
+    return count;
   }
   
   @override
