@@ -20,7 +20,10 @@ void main() {
         child: MyFriendsApp(),
       ),
     );
-    await tester.pumpAndSettle();
+    
+    // Use pump with duration instead of pumpAndSettle to avoid hanging
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
 
     // Verify that home page loads with welcome text
     expect(find.text('Willkommen bei MyFriends'), findsOneWidget);
