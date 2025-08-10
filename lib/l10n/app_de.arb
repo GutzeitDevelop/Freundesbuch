@@ -314,5 +314,55 @@
   "@ok": {
     "description": "OK button"
   },
-  "ok": "OK"
+  "ok": "OK",
+
+  "@photoCaptured": {
+    "description": "Photo captured success message"
+  },
+  "photoCaptured": "Foto aufgenommen",
+
+  "@photoSelected": {
+    "description": "Photo selected from gallery message"
+  },
+  "photoSelected": "Foto ausgewählt",
+
+  "@photoError": {
+    "description": "Photo error title"
+  },
+  "photoError": "Foto-Fehler",
+
+  "@cameraPermissionDenied": {
+    "description": "Camera permission denied message"
+  },
+  "cameraPermissionDenied": "Kamera-Berechtigung wurde verweigert. Bitte erlaube den Zugriff in den Einstellungen.",
+
+  "@galleryPermissionDenied": {
+    "description": "Gallery permission denied message"
+  },
+  "galleryPermissionDenied": "Galerie-Berechtigung wurde verweigert. Bitte erlaube den Zugriff in den Einstellungen.",
+
+  "@cameraNotFound": {
+    "description": "No camera found error"
+  },
+  "cameraNotFound": "Keine Kamera auf diesem Gerät gefunden.",
+
+  "@photoTooLarge": {
+    "description": "Photo file too large error"
+  },
+  "photoTooLarge": "Das Foto ist zu groß. Maximale Dateigröße: 10MB.",
+
+  "@unsupportedPhotoFormat": {
+    "description": "Unsupported photo format error"
+  },
+  "unsupportedPhotoFormat": "Nicht unterstütztes Fotoformat. Bitte verwende JPG, PNG oder HEIC.",
+
+  "@photoSourceDialog": {
+    "description": "Photo source selection dialog title"
+  },
+  "photoSourceDialog": "Foto hinzufügen",
+
+  "@removePhoto": {
+    "description": "Remove photo option"
+  },
+  "removePhoto": "Foto entfernen"
 }

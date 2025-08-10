@@ -197,4 +197,38 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ok => 'OK';
+
+  @override
+  String get photoCaptured => 'Foto aufgenommen';
+
+  @override
+  String get photoSelected => 'Foto ausgewählt';
+
+  @override
+  String get photoError => 'Foto-Fehler';
+
+  @override
+  String get cameraPermissionDenied =>
+      'Kamera-Berechtigung wurde verweigert. Bitte erlaube den Zugriff in den Einstellungen.';
+
+  @override
+  String get galleryPermissionDenied =>
+      'Galerie-Berechtigung wurde verweigert. Bitte erlaube den Zugriff in den Einstellungen.';
+
+  @override
+  String get cameraNotFound => 'Keine Kamera auf diesem Gerät gefunden.';
+
+  @override
+  String get photoTooLarge =>
+      'Das Foto ist zu groß. Maximale Dateigröße: 10MB.';
+
+  @override
+  String get unsupportedPhotoFormat =>
+      'Nicht unterstütztes Fotoformat. Bitte verwende JPG, PNG oder HEIC.';
+
+  @override
+  String get photoSourceDialog => 'Foto hinzufügen';
+
+  @override
+  String get removePhoto => 'Foto entfernen';
 }

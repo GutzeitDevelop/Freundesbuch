@@ -63,5 +63,15 @@
   "permissionDenied": "Permission Denied",
   "locationDisabled": "Location Disabled",
   "openSettings": "Open Settings",
-  "ok": "OK"
+  "ok": "OK",
+  "photoCaptured": "Photo captured",
+  "photoSelected": "Photo selected",
+  "photoError": "Photo Error",
+  "cameraPermissionDenied": "Camera permission denied. Please allow access in settings.",
+  "galleryPermissionDenied": "Gallery permission denied. Please allow access in settings.",
+  "cameraNotFound": "No camera found on this device.",
+  "photoTooLarge": "Photo is too large. Maximum file size: 10MB.",
+  "unsupportedPhotoFormat": "Unsupported photo format. Please use JPG, PNG, or HEIC.",
+  "photoSourceDialog": "Add Photo",
+  "removePhoto": "Remove Photo"
 }

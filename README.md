@@ -5,18 +5,18 @@ MyFriends is a mobile application designed to help you keep track of all the ama
 
 ## 🎯 Key Features
 
-### ✅ Currently Implemented (v0.2.1)
+### ✅ Currently Implemented (v0.2.2)
 - **Offline-First**: ✅ Full functionality without internet connection
 - **Friend Management**: ✅ Create, edit, delete detailed friend entries
 - **Customizable Templates**: ✅ Classic, Modern, and Custom templates
 - **Friend Books**: ✅ Organize friends into color-coded groups
 - **Location Tracking**: ✅ GPS location capture with address resolution
+- **Photo Memories**: ✅ Camera and gallery integration with secure storage
 - **Multi-language**: ✅ German (primary) and English support
 - **Cross-Platform**: ✅ iOS and Android deployment ready
 - **Security-First**: ✅ Following OWASP Mobile Security Guidelines
 
 ### 🔄 In Development
-- **Photo Memories**: Capture moments with camera/gallery integration
 - **Profile Sharing**: One-click profile sharing for app users
 
 ### 🎯 Planned Features
@@ -175,5 +175,5 @@ For issues or questions, please refer to the documentation or contact the develo
 
 ---
 
-**Version**: 0.1.0  
+**Version**: 0.2.2  
 **Last Updated**: August 2025

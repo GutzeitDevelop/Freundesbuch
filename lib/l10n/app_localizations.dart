@@ -475,6 +475,66 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'OK'**
   String get ok;
+
+  /// Photo captured success message
+  ///
+  /// In de, this message translates to:
+  /// **'Foto aufgenommen'**
+  String get photoCaptured;
+
+  /// Photo selected from gallery message
+  ///
+  /// In de, this message translates to:
+  /// **'Foto ausgewählt'**
+  String get photoSelected;
+
+  /// Photo error title
+  ///
+  /// In de, this message translates to:
+  /// **'Foto-Fehler'**
+  String get photoError;
+
+  /// Camera permission denied message
+  ///
+  /// In de, this message translates to:
+  /// **'Kamera-Berechtigung wurde verweigert. Bitte erlaube den Zugriff in den Einstellungen.'**
+  String get cameraPermissionDenied;
+
+  /// Gallery permission denied message
+  ///
+  /// In de, this message translates to:
+  /// **'Galerie-Berechtigung wurde verweigert. Bitte erlaube den Zugriff in den Einstellungen.'**
+  String get galleryPermissionDenied;
+
+  /// No camera found error
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Kamera auf diesem Gerät gefunden.'**
+  String get cameraNotFound;
+
+  /// Photo file too large error
+  ///
+  /// In de, this message translates to:
+  /// **'Das Foto ist zu groß. Maximale Dateigröße: 10MB.'**
+  String get photoTooLarge;
+
+  /// Unsupported photo format error
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht unterstütztes Fotoformat. Bitte verwende JPG, PNG oder HEIC.'**
+  String get unsupportedPhotoFormat;
+
+  /// Photo source selection dialog title
+  ///
+  /// In de, this message translates to:
+  /// **'Foto hinzufügen'**
+  String get photoSourceDialog;
+
+  /// Remove photo option
+  ///
+  /// In de, this message translates to:
+  /// **'Foto entfernen'**
+  String get removePhoto;
 }
 
 class _AppLocalizationsDelegate

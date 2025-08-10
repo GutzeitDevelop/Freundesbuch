@@ -2,12 +2,14 @@
 // 
 // Displays detailed information about a friend
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
+import '../../../../core/services/photo_service.dart';
 import '../../domain/entities/friend.dart';
 import '../providers/friends_provider.dart';
 import '../../../friendbook/presentation/providers/friend_books_provider.dart';
@@ -23,6 +25,7 @@ class FriendDetailPage extends ConsumerStatefulWidget {
 }
 
 class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
+  String? _resolvedPhotoPath;
   
   @override
   void initState() {
@@ -38,6 +41,32 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
     await ref.read(friendsProvider.notifier).loadFriends();
     // Invalidate the friend books provider to refresh
     ref.invalidate(friendBooksForFriendProvider(widget.friendId));
+    
+    // Resolve photo path
+    final friendsAsync = ref.read(friendsProvider);
+    if (friendsAsync.hasValue) {
+      final friend = friendsAsync.value?.firstWhere(
+        (f) => f.id == widget.friendId,
+        orElse: () => Friend(
+          id: '',
+          name: '',
+          firstMetDate: DateTime.now(),
+          templateType: 'classic',
+          friendBookIds: [],
+          isFavorite: false,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+      if (friend != null && friend.id.isNotEmpty && friend.photoPath != null) {
+        final resolvedPath = await PhotoService.resolvePhotoPath(friend.photoPath);
+        if (mounted) {
+          setState(() {
+            _resolvedPhotoPath = resolvedPath;
+          });
+        }
+      }
+    }
   }
   
   Future<void> _confirmDelete() async {
@@ -218,10 +247,10 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
                   CircleAvatar(
                     radius: 60,
                     backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                    backgroundImage: _friend!.photoPath != null 
-                        ? AssetImage(_friend!.photoPath!) as ImageProvider
+                    backgroundImage: _resolvedPhotoPath != null && _resolvedPhotoPath!.isNotEmpty
+                        ? FileImage(File(_resolvedPhotoPath!)) as ImageProvider
                         : null,
-                    child: _friend!.photoPath == null
+                    child: _resolvedPhotoPath == null || _resolvedPhotoPath!.isEmpty
                         ? Text(
                             _friend!.name.isNotEmpty ? _friend!.name[0].toUpperCase() : '?',
                             style: TextStyle(

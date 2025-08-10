@@ -52,8 +52,9 @@ dependencies:
   
   # Media & Files
   image_picker: ^1.1.2
-  camera: ^0.11.0+2
+  # camera: ^0.11.0+2  # Removed - using image_picker for both camera and gallery
   permission_handler: ^11.3.1
+  path: ^1.9.0
   
   # Location Services
   geolocator: ^13.0.2

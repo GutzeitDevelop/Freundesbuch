@@ -289,18 +289,24 @@ test('Camera permission request flow', () async {
 
 ---
 
-## ✅ Currently Implemented (v0.2.1)
+## ✅ Currently Implemented (v0.2.2)
 
 ### iOS Permissions (Info.plist)
 - ✅ **NSLocationWhenInUseUsageDescription**: Fully implemented
 - ✅ **NSLocationAlwaysAndWhenInUseUsageDescription**: Fully implemented  
 - ✅ **NSLocationUsageDescription**: Fully implemented
+- ✅ **NSCameraUsageDescription**: Fully implemented (v0.2.2)
+- ✅ **NSPhotoLibraryUsageDescription**: Fully implemented (v0.2.2)
 
 ### Android Permissions (AndroidManifest.xml)
 - ✅ **ACCESS_FINE_LOCATION**: Fully implemented
 - ✅ **ACCESS_COARSE_LOCATION**: Fully implemented
 - ✅ **INTERNET**: Fully implemented (for geocoding)
 - ✅ **ACCESS_BACKGROUND_LOCATION**: Optional, implemented
+- ✅ **CAMERA**: Fully implemented (v0.2.2)
+- ✅ **READ_EXTERNAL_STORAGE**: Fully implemented with API level constraints (v0.2.2)
+- ✅ **READ_MEDIA_IMAGES**: Fully implemented for Android 13+ (v0.2.2)
+- ✅ **WRITE_EXTERNAL_STORAGE**: Fully implemented with API level constraints (v0.2.2)
 
 ### Location Service Features
 - ✅ Runtime permission handling with proper user guidance
@@ -309,8 +315,17 @@ test('Camera permission request flow', () async {
 - ✅ Error handling with localized messages
 - ✅ Address resolution via geocoding services
 
+### Photo Service Features (New in v0.2.2)
+- ✅ Camera permission handling with security validation
+- ✅ Gallery permission handling for all Android versions
+- ✅ Secure photo storage in app-specific directories
+- ✅ File size and format validation (max 10MB, JPG/PNG/HEIC)
+- ✅ User-friendly error dialogs with localized messages
+- ✅ Battery-efficient image processing with quality optimization
+- ✅ Cross-platform compatibility (iOS & Android tested)
+
 ---
 
 **Last Updated**: August 2025  
-**Version**: 0.2.1  
+**Version**: 0.2.2  
 **Compliance**: GDPR, iOS App Store Guidelines, Google Play Store Policies

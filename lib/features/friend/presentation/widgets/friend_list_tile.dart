@@ -2,12 +2,14 @@
 // 
 // Displays a friend entry in a list
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../domain/entities/friend.dart';
+import '../../../../core/services/photo_service.dart';
 
 /// Widget for displaying a friend in a list
-class FriendListTile extends StatelessWidget {
+class FriendListTile extends StatefulWidget {
   final Friend friend;
   final VoidCallback? onTap;
   final VoidCallback? onFavoriteToggle;
@@ -20,6 +22,38 @@ class FriendListTile extends StatelessWidget {
   });
   
   @override
+  State<FriendListTile> createState() => _FriendListTileState();
+}
+
+class _FriendListTileState extends State<FriendListTile> {
+  String? _resolvedPhotoPath;
+  
+  @override
+  void initState() {
+    super.initState();
+    _resolvePhotoPath();
+  }
+  
+  @override
+  void didUpdateWidget(FriendListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.friend.photoPath != widget.friend.photoPath) {
+      _resolvePhotoPath();
+    }
+  }
+  
+  Future<void> _resolvePhotoPath() async {
+    if (widget.friend.photoPath != null) {
+      final resolvedPath = await PhotoService.resolvePhotoPath(widget.friend.photoPath);
+      if (mounted) {
+        setState(() {
+          _resolvedPhotoPath = resolvedPath;
+        });
+      }
+    }
+  }
+  
+  @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
     
@@ -29,12 +63,12 @@ class FriendListTile extends StatelessWidget {
         leading: CircleAvatar(
           radius: 28,
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          backgroundImage: friend.photoPath != null 
-              ? AssetImage(friend.photoPath!) as ImageProvider
+          backgroundImage: _resolvedPhotoPath != null && _resolvedPhotoPath!.isNotEmpty
+              ? FileImage(File(_resolvedPhotoPath!)) as ImageProvider
               : null,
-          child: friend.photoPath == null
+          child: _resolvedPhotoPath == null || _resolvedPhotoPath!.isEmpty
               ? Text(
-                  friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?',
+                  widget.friend.name.isNotEmpty ? widget.friend.name[0].toUpperCase() : '?',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -44,21 +78,21 @@ class FriendListTile extends StatelessWidget {
               : null,
         ),
         title: Text(
-          friend.name,
+          widget.friend.name,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (friend.nickname != null)
+            if (widget.friend.nickname != null)
               Text(
-                '"${friend.nickname}"',
+                '"${widget.friend.nickname}"',
                 style: TextStyle(
                   fontStyle: FontStyle.italic,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
-            if (friend.firstMetLocation != null)
+            if (widget.friend.firstMetLocation != null)
               Row(
                 children: [
                   Icon(
@@ -69,7 +103,7 @@ class FriendListTile extends StatelessWidget {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      friend.firstMetLocation!,
+                      widget.friend.firstMetLocation!,
                       style: TextStyle(
                         fontSize: 12,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -89,7 +123,7 @@ class FriendListTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  dateFormat.format(friend.firstMetDate),
+                  dateFormat.format(widget.friend.firstMetDate),
                   style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -101,12 +135,12 @@ class FriendListTile extends StatelessWidget {
         ),
         trailing: IconButton(
           icon: Icon(
-            friend.isFavorite ? Icons.favorite : Icons.favorite_border,
-            color: friend.isFavorite ? Colors.red : null,
+            widget.friend.isFavorite ? Icons.favorite : Icons.favorite_border,
+            color: widget.friend.isFavorite ? Colors.red : null,
           ),
-          onPressed: onFavoriteToggle,
+          onPressed: widget.onFavoriteToggle,
         ),
-        onTap: onTap,
+        onTap: widget.onTap,
       ),
     );
   }

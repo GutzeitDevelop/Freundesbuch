@@ -2,6 +2,7 @@
 // 
 // Shows details of a friend book and its members
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -164,7 +165,13 @@ class _FriendBookDetailPageState extends ConsumerState<FriendBookDetailPage> {
                     final friend = _availableFriends[index];
                     return ListTile(
                       leading: CircleAvatar(
-                        child: Text(friend.name[0].toUpperCase()),
+                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                        backgroundImage: friend.photoPath != null 
+                            ? FileImage(File(friend.photoPath!)) as ImageProvider
+                            : null,
+                        child: friend.photoPath == null
+                            ? Text(friend.name[0].toUpperCase())
+                            : null,
                       ),
                       title: Text(friend.name),
                       subtitle: friend.nickname != null 

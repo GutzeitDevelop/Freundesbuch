@@ -198,4 +198,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ok => 'OK';
+
+  @override
+  String get photoCaptured => 'Photo captured';
+
+  @override
+  String get photoSelected => 'Photo selected';
+
+  @override
+  String get photoError => 'Photo Error';
+
+  @override
+  String get cameraPermissionDenied =>
+      'Camera permission denied. Please allow access in settings.';
+
+  @override
+  String get galleryPermissionDenied =>
+      'Gallery permission denied. Please allow access in settings.';
+
+  @override
+  String get cameraNotFound => 'No camera found on this device.';
+
+  @override
+  String get photoTooLarge => 'Photo is too large. Maximum file size: 10MB.';
+
+  @override
+  String get unsupportedPhotoFormat =>
+      'Unsupported photo format. Please use JPG, PNG, or HEIC.';
+
+  @override
+  String get photoSourceDialog => 'Add Photo';
+
+  @override
+  String get removePhoto => 'Remove Photo';
 }

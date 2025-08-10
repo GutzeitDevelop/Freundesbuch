@@ -9,11 +9,12 @@ import 'package:uuid/uuid.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../core/services/location_service.dart';
+import '../../../../core/services/photo_service.dart';
+import 'dart:io';
 import '../../domain/entities/friend.dart';
 import '../../domain/entities/friend_template.dart';
 import '../providers/friends_provider.dart';
 import '../../../friendbook/presentation/providers/friend_books_provider.dart';
-import '../../../friendbook/domain/entities/friend_book.dart';
 import '../../../template/presentation/providers/template_provider.dart';
 
 /// Page for adding or editing a friend
@@ -45,6 +46,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   DateTime _firstMetDate = DateTime.now();
   DateTime? _birthday;
   String? _photoPath;
+  String? _resolvedPhotoPath;
   double? _latitude;
   double? _longitude;
   bool _isFavorite = false;
@@ -53,6 +55,8 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   Friend? _existingFriend;
   bool _isLoadingLocation = false;
   final LocationService _locationService = LocationService();
+  final PhotoService _photoService = PhotoService();
+  bool _isLoadingPhoto = false;
   
   bool get isEditing => widget.friendId != null;
   
@@ -67,6 +71,15 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   void _loadFriend() async {
     final friend = await ref.read(friendsProvider.notifier).getFriendById(widget.friendId!);
     if (friend != null && mounted) {
+      // Resolve photo path for display
+      if (friend.photoPath != null) {
+        final resolvedPath = await PhotoService.resolvePhotoPath(friend.photoPath);
+        if (mounted) {
+          setState(() {
+            _resolvedPhotoPath = resolvedPath;
+          });
+        }
+      }
       // Check if the template still exists
       String templateToUse = friend.templateType;
       final templatesAsync = ref.read(templateProvider);
@@ -782,15 +795,15 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-                    backgroundImage: _photoPath != null 
-                        ? AssetImage(_photoPath!) as ImageProvider
+                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    backgroundImage: (_resolvedPhotoPath ?? _photoPath) != null 
+                        ? FileImage(File(_resolvedPhotoPath ?? _photoPath!)) as ImageProvider
                         : null,
-                    child: _photoPath == null 
+                    child: (_resolvedPhotoPath ?? _photoPath) == null 
                         ? Icon(
                             Icons.person,
                             size: 60,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(context).colorScheme.onSurface,
                           )
                         : null,
                   ),
@@ -803,12 +816,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                       child: IconButton(
                         icon: const Icon(Icons.camera_alt, size: 20),
                         color: Theme.of(context).colorScheme.onPrimary,
-                        onPressed: () {
-                          // TODO: Implement photo capture
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.comingSoon)),
-                          );
-                        },
+                        onPressed: _showPhotoSourceDialog,
                       ),
                     ),
                   ),
@@ -858,6 +866,311 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
           ],
         ),
       ),
+    );
+  }
+
+  /// Shows dialog to choose photo source (camera or gallery)
+  /// 
+  /// Developer Notes:
+  /// This method presents a bottom sheet with options for camera or gallery.
+  /// It handles all permission checks and error states through the PhotoService.
+  /// After successful photo selection, it updates the UI and stores the path.
+  Future<void> _showPhotoSourceDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l10n.photoSourceDialog,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 24),
+                
+                // Camera option
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: Text(l10n.takePhoto),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _captureFromCamera();
+                  },
+                ),
+                
+                // Gallery option
+                ListTile(
+                  leading: const Icon(Icons.photo_library),
+                  title: Text(l10n.chooseFromGallery),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _selectFromGallery();
+                  },
+                ),
+                
+                // Remove photo option (only if photo exists)
+                if (_photoPath != null)
+                  ListTile(
+                    leading: const Icon(Icons.delete),
+                    title: Text(l10n.removePhoto),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _removePhoto();
+                    },
+                  ),
+                
+                const SizedBox(height: 16),
+                
+                // Cancel button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.cancel),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Captures photo using device camera with comprehensive error handling
+  /// 
+  /// Security Features:
+  /// - Permission validation before access
+  /// - File size and format validation
+  /// - Secure local storage
+  /// - No sensitive data in error messages
+  Future<void> _captureFromCamera() async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    setState(() {
+      _isLoadingPhoto = true;
+    });
+
+    try {
+      final photoData = await _photoService.captureFromCamera();
+      
+      // For new photos, we need to get the full path
+      final fullPath = await PhotoService.resolvePhotoPath(photoData.filePath);
+      
+      setState(() {
+        _photoPath = photoData.filePath;  // Store filename for persistence
+        _resolvedPhotoPath = fullPath;    // Use full path for display
+        _isLoadingPhoto = false;
+      });
+
+      // Show success message at top
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.photoCaptured),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(
+              top: 80,
+              left: 16,
+              right: 16,
+              bottom: MediaQuery.of(context).size.height - 140,
+            ),
+          ),
+        );
+      }
+    } on PhotoPermissionDeniedException catch (_) {
+      setState(() {
+        _isLoadingPhoto = false;
+      });
+      
+      if (mounted) {
+        _showErrorDialog(
+          l10n.photoError,
+          l10n.cameraPermissionDenied,
+          showSettingsOption: true,
+        );
+      }
+    } on CameraNotFoundException catch (_) {
+      setState(() {
+        _isLoadingPhoto = false;
+      });
+      
+      if (mounted) {
+        _showErrorDialog(l10n.photoError, l10n.cameraNotFound);
+      }
+    } on PhotoStorageException catch (e) {
+      setState(() {
+        _isLoadingPhoto = false;
+      });
+      
+      if (mounted) {
+        // Check specific error types for user-friendly messages
+        String message = l10n.photoError;
+        if (e.toString().contains('too large')) {
+          message = l10n.photoTooLarge;
+        } else if (e.toString().contains('format')) {
+          message = l10n.unsupportedPhotoFormat;
+        } else {
+          message = 'Fehler beim Aufnehmen des Fotos';
+        }
+        
+        _showErrorDialog(l10n.photoError, message);
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingPhoto = false;
+      });
+      
+      if (mounted) {
+        _showErrorDialog(l10n.photoError, 'Ein unerwarteter Fehler ist aufgetreten');
+      }
+    }
+  }
+
+  /// Selects photo from device gallery with security validation
+  /// 
+  /// Features:
+  /// - Gallery permission handling
+  /// - File format and size validation
+  /// - Secure copying to app directory
+  /// - User feedback for all states
+  Future<void> _selectFromGallery() async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    setState(() {
+      _isLoadingPhoto = true;
+    });
+
+    try {
+      final photoData = await _photoService.selectFromGallery();
+      
+      // For new photos, we need to get the full path
+      final fullPath = await PhotoService.resolvePhotoPath(photoData.filePath);
+      
+      setState(() {
+        _photoPath = photoData.filePath;  // Store filename for persistence
+        _resolvedPhotoPath = fullPath;    // Use full path for display
+        _isLoadingPhoto = false;
+      });
+
+      // Show success message at top
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.photoSelected),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(
+              top: 80,
+              left: 16,
+              right: 16,
+              bottom: MediaQuery.of(context).size.height - 140,
+            ),
+          ),
+        );
+      }
+    } on PhotoPermissionDeniedException catch (_) {
+      setState(() {
+        _isLoadingPhoto = false;
+      });
+      
+      if (mounted) {
+        _showErrorDialog(
+          l10n.photoError,
+          l10n.galleryPermissionDenied,
+          showSettingsOption: true,
+        );
+      }
+    } on PhotoStorageException catch (e) {
+      setState(() {
+        _isLoadingPhoto = false;
+      });
+      
+      if (mounted) {
+        // Check specific error types for user-friendly messages
+        String message = l10n.photoError;
+        if (e.toString().contains('too large')) {
+          message = l10n.photoTooLarge;
+        } else if (e.toString().contains('format')) {
+          message = l10n.unsupportedPhotoFormat;
+        } else {
+          message = 'Fehler beim Auswählen des Fotos';
+        }
+        
+        _showErrorDialog(l10n.photoError, message);
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingPhoto = false;
+      });
+      
+      if (mounted) {
+        _showErrorDialog(l10n.photoError, 'Ein unerwarteter Fehler ist aufgetreten');
+      }
+    }
+  }
+
+  /// Removes the selected photo
+  void _removePhoto() {
+    setState(() {
+      _photoPath = null;
+    });
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.removePhoto),
+        backgroundColor: Colors.orange,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          top: 80,
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).size.height - 140,
+        ),
+      ),
+    );
+  }
+
+  /// Shows error dialog with optional settings navigation
+  /// 
+  /// Developer Notes:
+  /// This method provides a consistent error dialog interface across the app.
+  /// It handles permission errors gracefully by offering settings navigation.
+  void _showErrorDialog(String title, String message, {bool showSettingsOption = false}) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            if (showSettingsOption)
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // Open device settings - this would require additional permission handling
+                  // For now, we just show the message
+                },
+                child: Text(l10n.openSettings),
+              ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.ok),
+            ),
+          ],
+        );
+      },
     );
   }
 }
