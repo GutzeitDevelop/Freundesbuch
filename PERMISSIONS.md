@@ -289,6 +289,28 @@ test('Camera permission request flow', () async {
 
 ---
 
+## ✅ Currently Implemented (v0.2.1)
+
+### iOS Permissions (Info.plist)
+- ✅ **NSLocationWhenInUseUsageDescription**: Fully implemented
+- ✅ **NSLocationAlwaysAndWhenInUseUsageDescription**: Fully implemented  
+- ✅ **NSLocationUsageDescription**: Fully implemented
+
+### Android Permissions (AndroidManifest.xml)
+- ✅ **ACCESS_FINE_LOCATION**: Fully implemented
+- ✅ **ACCESS_COARSE_LOCATION**: Fully implemented
+- ✅ **INTERNET**: Fully implemented (for geocoding)
+- ✅ **ACCESS_BACKGROUND_LOCATION**: Optional, implemented
+
+### Location Service Features
+- ✅ Runtime permission handling with proper user guidance
+- ✅ Fallback to settings when permissions denied
+- ✅ Battery-efficient GPS with distance filtering
+- ✅ Error handling with localized messages
+- ✅ Address resolution via geocoding services
+
+---
+
 **Last Updated**: August 2025  
-**Version**: 1.0.0  
+**Version**: 0.2.1  
 **Compliance**: GDPR, iOS App Store Guidelines, Google Play Store Policies

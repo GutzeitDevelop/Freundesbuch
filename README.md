@@ -4,14 +4,27 @@
 MyFriends is a mobile application designed to help you keep track of all the amazing people you meet throughout your life. The app works offline-first and allows you to document new connections with customizable templates, photos, and location data.
 
 ## 🎯 Key Features
-- **Offline-First**: Full functionality without internet connection
-- **Friend Management**: Create detailed entries for people you meet
-- **Customizable Templates**: Multiple input templates (Classic, Modern, Custom)
+
+### ✅ Currently Implemented (v0.2.1)
+- **Offline-First**: ✅ Full functionality without internet connection
+- **Friend Management**: ✅ Create, edit, delete detailed friend entries
+- **Customizable Templates**: ✅ Classic, Modern, and Custom templates
+- **Friend Books**: ✅ Organize friends into color-coded groups
+- **Location Tracking**: ✅ GPS location capture with address resolution
+- **Multi-language**: ✅ German (primary) and English support
+- **Cross-Platform**: ✅ iOS and Android deployment ready
+- **Security-First**: ✅ Following OWASP Mobile Security Guidelines
+
+### 🔄 In Development
+- **Photo Memories**: Capture moments with camera/gallery integration
 - **Profile Sharing**: One-click profile sharing for app users
-- **Friend Books**: Organize friends into different circles
-- **Location Tracking**: Automatically save where you first met
-- **Photo Memories**: Capture the moment with photos
-- **Multi-language**: German and English support
+
+### 🎯 Planned Features
+- Chat functionality (text, voice, video calls)
+- Status sharing (photos/videos)
+- Drinking-alarm with location sharing
+- Cloud sync with MyFriends-Cloud
+- Friends map with location sharing
 
 ## 🚀 Getting Started
 
@@ -34,13 +47,44 @@ cd Freundesbuch
 flutter pub get
 ```
 
-3. Run the app:
+3. Generate localization files:
 ```bash
-# For iOS
+flutter gen-l10n
+```
+
+4. Run the app:
+```bash
+# For iOS simulator
 flutter run -d ios
 
-# For Android
+# For Android emulator  
 flutter run -d android
+
+# List available devices
+flutter devices
+```
+
+## 🛠️ Development Commands
+
+```bash
+# Clean build files
+flutter clean
+
+# Get dependencies
+flutter pub get
+
+# Generate model files (after changes)
+flutter packages pub run build_runner build
+
+# Run tests
+flutter test
+
+# Build for release
+flutter build ios --release --no-codesign
+flutter build apk --release
+
+# Generate localization
+flutter gen-l10n
 ```
 
 ## 🏗️ Architecture

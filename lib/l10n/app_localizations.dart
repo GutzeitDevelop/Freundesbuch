@@ -439,6 +439,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Vorlage auswählen'**
   String get selectTemplate;
+
+  /// Location captured success message
+  ///
+  /// In de, this message translates to:
+  /// **'Standort erfasst'**
+  String get locationCaptured;
+
+  /// Location error title
+  ///
+  /// In de, this message translates to:
+  /// **'Standort-Fehler'**
+  String get locationError;
+
+  /// Permission denied title
+  ///
+  /// In de, this message translates to:
+  /// **'Berechtigung verweigert'**
+  String get permissionDenied;
+
+  /// Location disabled title
+  ///
+  /// In de, this message translates to:
+  /// **'Standort deaktiviert'**
+  String get locationDisabled;
+
+  /// Open settings button
+  ///
+  /// In de, this message translates to:
+  /// **'Einstellungen öffnen'**
+  String get openSettings;
+
+  /// OK button
+  ///
+  /// In de, this message translates to:
+  /// **'OK'**
+  String get ok;
 }
 
 class _AppLocalizationsDelegate

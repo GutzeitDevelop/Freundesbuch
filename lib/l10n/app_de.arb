@@ -284,5 +284,35 @@
   "@selectTemplate": {
     "description": "Select template prompt"
   },
-  "selectTemplate": "Vorlage auswählen"
+  "selectTemplate": "Vorlage auswählen",
+  
+  "@locationCaptured": {
+    "description": "Location captured success message"
+  },
+  "locationCaptured": "Standort erfasst",
+  
+  "@locationError": {
+    "description": "Location error title"
+  },
+  "locationError": "Standort-Fehler",
+  
+  "@permissionDenied": {
+    "description": "Permission denied title"
+  },
+  "permissionDenied": "Berechtigung verweigert",
+  
+  "@locationDisabled": {
+    "description": "Location disabled title"
+  },
+  "locationDisabled": "Standort deaktiviert",
+  
+  "@openSettings": {
+    "description": "Open settings button"
+  },
+  "openSettings": "Einstellungen öffnen",
+  
+  "@ok": {
+    "description": "OK button"
+  },
+  "ok": "OK"
 }

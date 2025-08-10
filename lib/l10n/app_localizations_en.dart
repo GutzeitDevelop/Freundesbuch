@@ -180,4 +180,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectTemplate => 'Select Template';
+
+  @override
+  String get locationCaptured => 'Location captured';
+
+  @override
+  String get locationError => 'Location Error';
+
+  @override
+  String get permissionDenied => 'Permission Denied';
+
+  @override
+  String get locationDisabled => 'Location Disabled';
+
+  @override
+  String get openSettings => 'Open Settings';
+
+  @override
+  String get ok => 'OK';
 }

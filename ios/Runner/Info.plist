@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs location access to save where you first met your friends. Location data is stored securely on your device and helps you remember meaningful places.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs location access to save where you first met your friends. Location data is stored securely on your device and helps you remember meaningful places.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>This app needs location access to save where you first met your friends. Location data is stored securely on your device and helps you remember meaningful places.</string>
 </dict>
 </plist>

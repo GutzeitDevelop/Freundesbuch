@@ -57,5 +57,11 @@
   "classicTemplate": "Classic",
   "modernTemplate": "Modern",
   "customTemplate": "Custom",
-  "selectTemplate": "Select Template"
+  "selectTemplate": "Select Template",
+  "locationCaptured": "Location captured",
+  "locationError": "Location Error",
+  "permissionDenied": "Permission Denied",
+  "locationDisabled": "Location Disabled",
+  "openSettings": "Open Settings",
+  "ok": "OK"
 }

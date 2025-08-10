@@ -179,4 +179,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get selectTemplate => 'Vorlage auswählen';
+
+  @override
+  String get locationCaptured => 'Standort erfasst';
+
+  @override
+  String get locationError => 'Standort-Fehler';
+
+  @override
+  String get permissionDenied => 'Berechtigung verweigert';
+
+  @override
+  String get locationDisabled => 'Standort deaktiviert';
+
+  @override
+  String get openSettings => 'Einstellungen öffnen';
+
+  @override
+  String get ok => 'OK';
 }

@@ -80,6 +80,9 @@ class _FriendBookDetailPageState extends ConsumerState<FriendBookDetailPage> {
     );
     await ref.read(friendsProvider.notifier).saveFriend(updatedFriend);
     
+    // Invalidate the friend count provider to update the display
+    ref.invalidate(friendCountInBookProvider(widget.friendBookId));
+    
     await _loadFriendBook();
   }
   
@@ -92,6 +95,9 @@ class _FriendBookDetailPageState extends ConsumerState<FriendBookDetailPage> {
       friendBookIds: friend.friendBookIds.where((id) => id != widget.friendBookId).toList(),
     );
     await ref.read(friendsProvider.notifier).saveFriend(updatedFriend);
+    
+    // Invalidate the friend count provider to update the display
+    ref.invalidate(friendCountInBookProvider(widget.friendBookId));
     
     await _loadFriendBook();
   }

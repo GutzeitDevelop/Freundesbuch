@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
+import '../../../../core/services/location_service.dart';
 import '../../domain/entities/friend.dart';
 import '../../domain/entities/friend_template.dart';
 import '../providers/friends_provider.dart';
@@ -50,6 +51,8 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   String _selectedTemplate = 'classic';
   List<String> _selectedFriendBookIds = [];
   Friend? _existingFriend;
+  bool _isLoadingLocation = false;
+  final LocationService _locationService = LocationService();
   
   bool get isEditing => widget.friendId != null;
   
@@ -184,6 +187,21 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
       // Invalidate the friendBooks provider to refresh data
       ref.invalidate(friendBooksForFriendProvider(friend.id));
       
+      // Invalidate friend count providers for all affected books
+      for (final bookId in _selectedFriendBookIds) {
+        ref.invalidate(friendCountInBookProvider(bookId));
+      }
+      
+      // If editing, also invalidate count for books that were deselected
+      if (_existingFriend != null) {
+        final previousBookIds = _existingFriend!.friendBookIds;
+        for (final bookId in previousBookIds) {
+          if (!_selectedFriendBookIds.contains(bookId)) {
+            ref.invalidate(friendCountInBookProvider(bookId));
+          }
+        }
+      }
+      
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -198,6 +216,84 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         }
       }
     }
+  }
+  
+  /// Get current GPS location and update the form
+  Future<void> _getCurrentLocation() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoadingLocation = true;
+    });
+    
+    try {
+      final locationData = await _locationService.getCurrentLocation(
+        includeAddress: true,
+        timeout: const Duration(seconds: 15),
+      );
+      
+      if (!mounted) return;
+      
+      setState(() {
+        _firstMetLocationController.text = locationData.address ?? 
+            '${locationData.latitude.toStringAsFixed(6)}, ${locationData.longitude.toStringAsFixed(6)}';
+        _latitude = locationData.latitude;
+        _longitude = locationData.longitude;
+      });
+      
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${l10n.locationCaptured}: ${locationData.address ?? "GPS coordinates"}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      
+    } on LocationPermissionDeniedException catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      _showLocationError(l10n.permissionDenied, e.message);
+    } on LocationServicesDisabledException catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      _showLocationError(l10n.locationDisabled, e.message);
+    } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      _showLocationError(l10n.locationError, 'Failed to get location: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingLocation = false;
+        });
+      }
+    }
+  }
+  
+  /// Show location error dialog with options
+  void _showLocationError(String title, String message) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.ok),
+          ),
+          if (title == l10n.permissionDenied || title == l10n.locationDisabled)
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _locationService.openLocationSettings();
+              },
+              child: Text(l10n.openSettings),
+            ),
+        ],
+      ),
+    );
   }
   
   Widget _buildTemplateSelector() {
@@ -599,15 +695,20 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         decoration: InputDecoration(
           labelText: l10n.firstMet,
           prefixIcon: const Icon(Icons.location_on),
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.my_location),
-            onPressed: () {
-              // TODO: Get current location
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.comingSoon)),
-              );
-            },
-          ),
+          suffixIcon: _isLoadingLocation
+              ? const Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.my_location),
+                  tooltip: l10n.currentLocation,
+                  onPressed: _getCurrentLocation,
+                ),
         ),
       ),
     );
