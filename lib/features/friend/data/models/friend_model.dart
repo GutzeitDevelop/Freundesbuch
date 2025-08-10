@@ -171,6 +171,61 @@ class FriendModel extends HiveObject {
     );
   }
   
+  /// Creates a copy with updated fields
+  FriendModel copyWith({
+    String? id,
+    String? name,
+    String? nickname,
+    String? photoPath,
+    String? firstMetLocation,
+    double? firstMetLatitude,
+    double? firstMetLongitude,
+    DateTime? firstMetDate,
+    DateTime? birthday,
+    String? phone,
+    String? email,
+    String? homeLocation,
+    String? work,
+    String? likes,
+    String? dislikes,
+    String? hobbies,
+    String? favoriteColor,
+    String? socialMedia,
+    String? notes,
+    String? templateType,
+    List<String>? friendBookIds,
+    bool? isFavorite,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return FriendModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      nickname: nickname ?? this.nickname,
+      photoPath: photoPath ?? this.photoPath,
+      firstMetLocation: firstMetLocation ?? this.firstMetLocation,
+      firstMetLatitude: firstMetLatitude ?? this.firstMetLatitude,
+      firstMetLongitude: firstMetLongitude ?? this.firstMetLongitude,
+      firstMetDate: firstMetDate ?? this.firstMetDate,
+      birthday: birthday ?? this.birthday,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      homeLocation: homeLocation ?? this.homeLocation,
+      work: work ?? this.work,
+      likes: likes ?? this.likes,
+      dislikes: dislikes ?? this.dislikes,
+      hobbies: hobbies ?? this.hobbies,
+      favoriteColor: favoriteColor ?? this.favoriteColor,
+      socialMedia: socialMedia ?? this.socialMedia,
+      notes: notes ?? this.notes,
+      templateType: templateType ?? this.templateType,
+      friendBookIds: friendBookIds ?? this.friendBookIds,
+      isFavorite: isFavorite ?? this.isFavorite,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+  
   /// Creates a FriendModel from JSON
   factory FriendModel.fromJson(Map<String, dynamic> json) => 
     _$FriendModelFromJson(json);

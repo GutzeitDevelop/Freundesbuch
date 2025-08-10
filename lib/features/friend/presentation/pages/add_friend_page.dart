@@ -11,6 +11,8 @@ import '../../../../core/navigation/app_router.dart';
 import '../../domain/entities/friend.dart';
 import '../../domain/entities/friend_template.dart';
 import '../providers/friends_provider.dart';
+import '../../../friendbook/presentation/providers/friend_books_provider.dart';
+import '../../../friendbook/domain/entities/friend_book.dart';
 
 /// Page for adding or editing a friend
 class AddFriendPage extends ConsumerStatefulWidget {
@@ -45,6 +47,8 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   double? _longitude;
   bool _isFavorite = false;
   String _selectedTemplate = 'classic';
+  List<String> _selectedFriendBookIds = [];
+  Friend? _existingFriend;
   
   bool get isEditing => widget.friendId != null;
   
@@ -60,6 +64,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
     final friend = await ref.read(friendsProvider.notifier).getFriendById(widget.friendId!);
     if (friend != null && mounted) {
       setState(() {
+        _existingFriend = friend;
         _nameController.text = friend.name;
         _nicknameController.text = friend.nickname ?? '';
         _phoneController.text = friend.phone ?? '';
@@ -80,6 +85,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         _longitude = friend.firstMetLongitude;
         _isFavorite = friend.isFavorite;
         _selectedTemplate = friend.templateType;
+        _selectedFriendBookIds = List<String>.from(friend.friendBookIds);
       });
     }
   }
@@ -130,20 +136,44 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
             ? null : _socialMediaController.text.trim(),
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
         templateType: _selectedTemplate,
-        friendBookIds: [],
+        friendBookIds: _selectedFriendBookIds,
         isFavorite: _isFavorite,
-        createdAt: isEditing ? now : now,
+        createdAt: _existingFriend?.createdAt ?? now,
         updatedAt: now,
       );
       
       await ref.read(friendsProvider.notifier).saveFriend(friend);
+      
+      // Update the friend books to include this friend
+      for (final bookId in _selectedFriendBookIds) {
+        await ref.read(friendBooksProvider.notifier).addFriendToBook(bookId, friend.id);
+      }
+      
+      // If editing, remove friend from books that were deselected
+      if (_existingFriend != null) {
+        final previousBookIds = _existingFriend!.friendBookIds;
+        for (final bookId in previousBookIds) {
+          if (!_selectedFriendBookIds.contains(bookId)) {
+            await ref.read(friendBooksProvider.notifier).removeFriendFromBook(bookId, friend.id);
+          }
+        }
+      }
+      
+      // Invalidate the friendBooks provider to refresh data
+      ref.invalidate(friendBooksForFriendProvider(friend.id));
       
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.friendSaved)),
         );
-        context.go(AppRouter.friendsList);
+        
+        // If editing, go back to detail page, otherwise go to list
+        if (isEditing) {
+          context.go('/friends/${friend.id}');
+        } else {
+          context.go(AppRouter.friendsList);
+        }
       }
     }
   }
@@ -171,6 +201,122 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         });
       },
     );
+  }
+  
+  Widget _buildFriendBooksSection() {
+    final l10n = AppLocalizations.of(context)!;
+    final friendBooksAsync = ref.watch(friendBooksProvider);
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.book, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 8),
+            Text(
+              l10n.friendBooks,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        friendBooksAsync.when(
+          data: (friendBooks) {
+            if (friendBooks.isEmpty) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Noch keine Freundebücher erstellt', // l10n.noFriendBooksYet,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            
+            return Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: friendBooks.map((book) {
+                final isSelected = _selectedFriendBookIds.contains(book.id);
+                final bookColor = _getColorFromHex(book.colorHex);
+                
+                return FilterChip(
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedFriendBookIds.add(book.id);
+                      } else {
+                        _selectedFriendBookIds.remove(book.id);
+                      }
+                    });
+                  },
+                  avatar: Icon(
+                    _getIconFromName(book.iconName),
+                    size: 18,
+                    color: isSelected ? Colors.white : bookColor,
+                  ),
+                  label: Text(book.name),
+                  backgroundColor: bookColor.withOpacity(0.1),
+                  selectedColor: bookColor,
+                  checkmarkColor: Colors.white,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : null,
+                  ),
+                );
+              }).toList(),
+            );
+          },
+          loading: () => const LinearProgressIndicator(),
+          error: (_, __) => const SizedBox.shrink(),
+        ),
+      ],
+    );
+  }
+  
+  Color _getColorFromHex(String hexColor) {
+    try {
+      return Color(int.parse(hexColor.replaceFirst('#', '0xFF')));
+    } catch (e) {
+      return Colors.blue;
+    }
+  }
+  
+  IconData _getIconFromName(String iconName) {
+    switch (iconName) {
+      case 'family':
+        return Icons.family_restroom;
+      case 'work':
+        return Icons.work;
+      case 'school':
+        return Icons.school;
+      case 'sports':
+        return Icons.sports_soccer;
+      case 'music':
+        return Icons.music_note;
+      case 'travel':
+        return Icons.flight;
+      case 'gaming':
+        return Icons.sports_esports;
+      case 'food':
+        return Icons.restaurant;
+      case 'party':
+        return Icons.celebration;
+      case 'heart':
+        return Icons.favorite;
+      default:
+        return Icons.group;
+    }
   }
   
   List<Widget> _buildFormFields() {
@@ -367,6 +513,10 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         maxLines: 3,
       ),
     );
+    widgets.add(const SizedBox(height: 16));
+    
+    // FriendBooks selection
+    widgets.add(_buildFriendBooksSection());
     
     return widgets;
   }
@@ -378,6 +528,23 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isEditing ? l10n.edit : l10n.addFriend),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // If editing, go back to friend detail
+            // Otherwise go back to where we came from (home or friends list)
+            if (isEditing) {
+              context.go('/friends/${widget.friendId}');
+            } else {
+              // Check if we can pop, otherwise go home
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                context.go(AppRouter.home);
+              }
+            }
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(
@@ -459,7 +626,18 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
             
             // Cancel button
             OutlinedButton(
-              onPressed: () => context.go(AppRouter.friendsList),
+              onPressed: () {
+                // Same logic as back button
+                if (isEditing) {
+                  context.go('/friends/${widget.friendId}');
+                } else {
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context);
+                  } else {
+                    context.go(AppRouter.home);
+                  }
+                }
+              },
               child: Text(l10n.cancel),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),

@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/friend/presentation/pages/add_friend_page.dart';
 import '../../features/friend/presentation/pages/friends_list_page.dart';
 import '../../features/friend/presentation/pages/friend_detail_page.dart';
+import '../../features/friendbook/presentation/pages/friend_books_list_page.dart';
+import '../../features/friendbook/presentation/pages/friend_book_detail_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 
 /// Provider for the app router
@@ -22,6 +24,8 @@ class AppRouter {
   static const String addFriend = '/friends/add';
   static const String friendDetail = '/friends/:id';
   static const String editFriend = '/friends/:id/edit';
+  static const String friendBooksList = '/friendbooks';
+  static const String friendBookDetail = '/friendbooks/:id';
   
   /// Main router configuration
   static final GoRouter router = GoRouter(
@@ -67,6 +71,24 @@ class AppRouter {
                 },
               ),
             ],
+          ),
+        ],
+      ),
+      
+      // FriendBooks list
+      GoRoute(
+        path: friendBooksList,
+        name: 'friendBooksList',
+        builder: (context, state) => const FriendBooksListPage(),
+        routes: [
+          // FriendBook detail
+          GoRoute(
+            path: ':id',
+            name: 'friendBookDetail',
+            builder: (context, state) {
+              final bookId = state.pathParameters['id']!;
+              return FriendBookDetailPage(friendBookId: bookId);
+            },
           ),
         ],
       ),

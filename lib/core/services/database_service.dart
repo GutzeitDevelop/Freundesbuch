@@ -4,6 +4,7 @@
 
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../features/friend/data/models/friend_model.dart';
+import '../../features/friendbook/data/models/friend_book_model.dart';
 
 /// Service for managing database initialization
 class DatabaseService {
@@ -31,6 +32,11 @@ class DatabaseService {
     if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(FriendModelAdapter());
     }
+    
+    // Register FriendBookModel adapter if not already registered
+    if (!Hive.isAdapterRegistered(1)) {
+      Hive.registerAdapter(FriendBookModelAdapter());
+    }
   }
   
   /// Opens all required Hive boxes
@@ -38,8 +44,10 @@ class DatabaseService {
     // Open friends box
     await Hive.openBox<FriendModel>('friends');
     
+    // Open friendbooks box
+    await Hive.openBox<FriendBookModel>('friendbooks');
+    
     // Open other boxes as needed
-    // await Hive.openBox<FriendBookModel>('friend_books');
     // await Hive.openBox<TemplateModel>('templates');
   }
   

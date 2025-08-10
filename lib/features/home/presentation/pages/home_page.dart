@@ -52,8 +52,8 @@ class HomePage extends StatelessWidget {
             // Action buttons
             ElevatedButton.icon(
               onPressed: () {
-                // Navigate to add friend page
-                context.go(AppRouter.addFriend);
+                // Navigate to add friend page using push to maintain navigation stack
+                context.push(AppRouter.addFriend);
               },
               icon: const Icon(Icons.person_add),
               label: Text(l10n.addFriend),
@@ -68,6 +68,16 @@ class HomePage extends StatelessWidget {
               icon: const Icon(Icons.list),
               label: Text(l10n.myFriends),
             ),
+            const SizedBox(height: 16),
+            
+            OutlinedButton.icon(
+              onPressed: () {
+                // Navigate to friend books list
+                context.go(AppRouter.friendBooksList);
+              },
+              icon: const Icon(Icons.book),
+              label: Text(l10n.friendBooks),
+            ),
           ],
         ),
       ),
@@ -75,8 +85,8 @@ class HomePage extends StatelessWidget {
       // Floating action button for quick add
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Quick add friend
-          context.go(AppRouter.addFriend);
+          // Quick add friend using push to maintain navigation stack
+          context.push(AppRouter.addFriend);
         },
         tooltip: l10n.quickAdd,
         child: const Icon(Icons.add),

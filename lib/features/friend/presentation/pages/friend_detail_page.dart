@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../domain/entities/friend.dart';
 import '../providers/friends_provider.dart';
+import '../../../friendbook/presentation/providers/friend_books_provider.dart';
 
 /// Page displaying friend details
 class FriendDetailPage extends ConsumerStatefulWidget {
@@ -22,21 +23,21 @@ class FriendDetailPage extends ConsumerStatefulWidget {
 }
 
 class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
-  Friend? _friend;
   
   @override
   void initState() {
     super.initState();
-    _loadFriend();
+    // Load friend initially
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadFriend();
+    });
   }
   
   Future<void> _loadFriend() async {
-    final friend = await ref.read(friendsProvider.notifier).getFriendById(widget.friendId);
-    if (mounted) {
-      setState(() {
-        _friend = friend;
-      });
-    }
+    // Refresh the friends provider to get latest data
+    await ref.read(friendsProvider.notifier).loadFriends();
+    // Invalidate the friend books provider to refresh
+    ref.invalidate(friendBooksForFriendProvider(widget.friendId));
   }
   
   Future<void> _confirmDelete() async {
@@ -113,7 +114,23 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     
-    if (_friend == null) {
+    // Watch the friends provider to get real-time updates
+    final friendsAsync = ref.watch(friendsProvider);
+    final friend = friendsAsync.value?.firstWhere(
+      (f) => f.id == widget.friendId,
+      orElse: () => Friend(
+        id: '',
+        name: '',
+        firstMetDate: DateTime.now(),
+        templateType: 'classic',
+        friendBookIds: [],
+        isFavorite: false,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
+    
+    if (friend == null || friend.id.isEmpty) {
       return Scaffold(
         appBar: AppBar(),
         body: const Center(
@@ -121,6 +138,8 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
         ),
       );
     }
+    
+    final _friend = friend;
     
     final dateFormat = DateFormat.yMMMMd(Localizations.localeOf(context).languageCode);
     
@@ -164,7 +183,7 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
             onSelected: (value) {
               switch (value) {
                 case 'edit':
-                  context.go('/friends/${_friend!.id}/edit');
+                  context.go('/friends/${_friend.id}/edit');
                   break;
                 case 'delete':
                   _confirmDelete();
@@ -309,6 +328,51 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
                     _buildInfoRow(Icons.work, l10n.work, _friend!.work),
                     const Divider(height: 32),
                   ],
+                  
+                  // Friend books
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final friendBooksAsync = ref.watch(friendBooksForFriendProvider(_friend.id));
+                      return friendBooksAsync.when(
+                        data: (friendBooks) {
+                          if (friendBooks.isEmpty) return const SizedBox.shrink();
+                          
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.friendBooks,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: friendBooks.map((book) {
+                                  final bookColor = Color(int.parse(book.colorHex.replaceFirst('#', '0xFF')));
+                                  return ActionChip(
+                                    avatar: Icon(
+                                      Icons.book,
+                                      size: 18,
+                                      color: bookColor,
+                                    ),
+                                    label: Text(book.name),
+                                    backgroundColor: bookColor.withOpacity(0.1),
+                                    onPressed: () {
+                                      context.go('/friendbooks/${book.id}');
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                              const Divider(height: 32),
+                            ],
+                          );
+                        },
+                        loading: () => const LinearProgressIndicator(),
+                        error: (_, __) => const SizedBox.shrink(),
+                      );
+                    },
+                  ),
                   
                   // Preferences
                   if (_friend!.likes != null || _friend!.dislikes != null || 

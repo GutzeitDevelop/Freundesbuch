@@ -53,6 +53,10 @@ class _FriendsListPageState extends ConsumerState<FriendsListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.myFriends),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go(AppRouter.home),
+        ),
         actions: [
           IconButton(
             icon: Icon(
