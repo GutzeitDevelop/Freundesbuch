@@ -1,6 +1,7 @@
 // FriendBook detail page
 // 
 // Shows details of a friend book and its members
+// Version 0.3.0 - Enhanced with centralized services
 
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -8,6 +9,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../../../core/widgets/standard_app_bar.dart';
+import '../../../../core/widgets/consistent_action_button.dart';
 import '../../domain/entities/friend_book.dart';
 import '../providers/friend_books_provider.dart';
 import '../../../friend/domain/entities/friend.dart';
@@ -204,23 +208,40 @@ class _FriendBookDetailPageState extends ConsumerState<FriendBookDetailPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final navigationService = ref.read(navigationServiceProvider);
+    final notificationService = ref.read(notificationServiceProvider);
     
     if (_friendBook == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(
-          child: CircularProgressIndicator(),
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          navigationService.navigateBack(context);
+        },
+        child: Scaffold(
+          appBar: StandardAppBar(
+            title: 'Freundebuch',
+          ),
+          body: const Center(
+            child: CircularProgressIndicator(),
+          ),
         ),
       );
     }
     
     final bookColor = _getColorFromHex(_friendBook!.colorHex);
     
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_friendBook!.name),
-        backgroundColor: bookColor.withOpacity(0.1),
-        actions: [
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        navigationService.navigateBack(context);
+      },
+      child: Scaffold(
+        appBar: StandardAppBar(
+          title: _friendBook!.name,
+          backgroundColor: bookColor.withAlpha(26),
+          actions: [
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
@@ -354,7 +375,7 @@ class _FriendBookDetailPageState extends ConsumerState<FriendBookDetailPage> {
                         },
                         child: FriendListTile(
                           friend: friend,
-                          onTap: () => context.push('/friends/${friend.id}'),
+                          onTap: () => navigationService.navigateTo(context, '/friends/${friend.id}'),
                           onFavoriteToggle: () {
                             ref.read(friendsProvider.notifier).toggleFavorite(friend.id);
                           },
@@ -369,6 +390,7 @@ class _FriendBookDetailPageState extends ConsumerState<FriendBookDetailPage> {
         onPressed: _showAddFriendsDialog,
         tooltip: 'Freunde hinzufügen',
         child: const Icon(Icons.person_add),
+      ),
       ),
     );
   }

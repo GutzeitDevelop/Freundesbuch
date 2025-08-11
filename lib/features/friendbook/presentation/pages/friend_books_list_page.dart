@@ -1,12 +1,16 @@
 // FriendBooks list page
 // 
 // Displays all friend books with management options
+// Version 0.3.0 - Enhanced with centralized services
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../../../core/widgets/standard_app_bar.dart';
+import '../../../../core/widgets/consistent_action_button.dart';
 import '../../domain/entities/friend_book.dart';
 import '../providers/friend_books_provider.dart';
 import '../widgets/friend_book_list_tile.dart';
@@ -84,23 +88,27 @@ class _FriendBooksListPageState extends ConsumerState<FriendBooksListPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final friendBooksAsync = ref.watch(friendBooksProvider);
+    final navigationService = ref.read(navigationServiceProvider);
+    final notificationService = ref.read(notificationServiceProvider);
     
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Meine Freundebücher'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRouter.home),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        navigationService.navigateBack(context);
+      },
+      child: Scaffold(
+        appBar: StandardAppBar(
+          title: 'Meine Freundebücher',
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: _showCreateDialog,
+              tooltip: l10n.createFriendBook,
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _showCreateDialog,
-            tooltip: l10n.createFriendBook,
-          ),
-        ],
-      ),
-      body: Column(
+        body: Column(
         children: [
           // Search bar
           Padding(
@@ -169,7 +177,7 @@ class _FriendBooksListPageState extends ConsumerState<FriendBooksListPage> {
                     final friendBook = friendBooks[index];
                     return FriendBookListTile(
                       friendBook: friendBook,
-                      onTap: () => context.go('/friendbooks/${friendBook.id}'),
+                      onTap: () => navigationService.navigateTo(context, '/friendbooks/${friendBook.id}'),
                       onEdit: () => _showEditDialog(friendBook),
                       onDelete: () => _confirmDelete(friendBook),
                     );
@@ -211,6 +219,7 @@ class _FriendBooksListPageState extends ConsumerState<FriendBooksListPage> {
         onPressed: _showCreateDialog,
         tooltip: l10n.createFriendBook,
         child: const Icon(Icons.add),
+      ),
       ),
     );
   }

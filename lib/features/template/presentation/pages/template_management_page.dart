@@ -1,12 +1,15 @@
 // Template management page
 // 
 // Page for managing custom templates
+// Version 0.3.0 - Enhanced with centralized services
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../../../core/widgets/standard_app_bar.dart';
 import '../../../friend/domain/entities/friend_template.dart';
 import '../providers/template_provider.dart';
 import '../widgets/create_template_dialog.dart';
@@ -170,14 +173,18 @@ class TemplateManagementPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final templatesAsync = ref.watch(templateProvider);
     
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Template Verwaltung'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRouter.home),
+    final navigationService = ref.read(navigationServiceProvider);
+    
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        navigationService.navigateBack(context);
+      },
+      child: Scaffold(
+        appBar: StandardAppBar(
+          title: 'Template Verwaltung',
         ),
-      ),
       body: templatesAsync.when(
         data: (templates) {
           if (templates.isEmpty) {
@@ -275,6 +282,7 @@ class TemplateManagementPage extends ConsumerWidget {
         onPressed: () => _showCreateDialog(context),
         tooltip: 'Neues Template',
         child: const Icon(Icons.add),
+      ),
       ),
     );
   }

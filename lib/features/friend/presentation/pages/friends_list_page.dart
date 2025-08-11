@@ -1,12 +1,15 @@
 // Friends list page
 // 
 // Displays list of all friends with search and filtering
+// Version 0.3.0 - Enhanced with centralized services
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../../../core/widgets/standard_app_bar.dart';
 import '../../domain/entities/friend.dart';
 import '../providers/friends_provider.dart';
 import '../widgets/friend_list_tile.dart';
@@ -49,15 +52,18 @@ class _FriendsListPageState extends ConsumerState<FriendsListPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final friendsState = ref.watch(friendsProvider);
+    final navigationService = ref.read(navigationServiceProvider);
     
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.myFriends),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRouter.home),
-        ),
-        actions: [
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        navigationService.navigateBack(context);
+      },
+      child: Scaffold(
+        appBar: StandardAppBar(
+          title: l10n.myFriends,
+          actions: [
           IconButton(
             icon: Icon(
               _showFavoritesOnly ? Icons.favorite : Icons.favorite_border,
@@ -133,7 +139,7 @@ class _FriendsListPageState extends ConsumerState<FriendsListPage> {
                     final friend = friends[index];
                     return FriendListTile(
                       friend: friend,
-                      onTap: () => context.go('/friends/${friend.id}'),
+                      onTap: () => navigationService.navigateTo(context, '/friends/${friend.id}'),
                       onFavoriteToggle: () {
                         ref.read(friendsProvider.notifier).toggleFavorite(friend.id);
                       },
@@ -173,9 +179,10 @@ class _FriendsListPageState extends ConsumerState<FriendsListPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go(AppRouter.addFriend),
+        onPressed: () => navigationService.navigateTo(context, AppRouter.addFriend),
         tooltip: l10n.addFriend,
         child: const Icon(Icons.person_add),
+      ),
       ),
     );
   }

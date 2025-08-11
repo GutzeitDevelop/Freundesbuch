@@ -62,8 +62,17 @@ class NavigationService {
   /// 
   /// Use this for normal navigation that should add to history
   void navigateTo(BuildContext context, String route, {Object? extra}) {
-    _addToHistory(GoRouter.of(context).routerDelegate.currentConfiguration.uri.toString());
+    // Add current route to history before navigating
+    final currentPath = GoRouter.of(context).routerDelegate.currentConfiguration.uri.toString();
+    if (currentPath.isNotEmpty && currentPath != '/') {
+      _addToHistory(currentPath);
+    }
+    
+    // Navigate to new route
     context.push(route, extra: extra);
+    
+    // Update current route
+    _currentRoute = route;
   }
   
   /// Replace current route (doesn't add to history)
@@ -82,27 +91,44 @@ class NavigationService {
   /// 
   /// Returns true if navigation was successful, false if at root
   bool navigateBack(BuildContext context) {
-    if (canGoBack()) {
-      // Remove current route from history
+    // First try to use GoRouter's pop if possible
+    if (context.canPop()) {
+      context.pop();
+      
+      // Remove the current route from history
+      if (_navigationHistory.isNotEmpty) {
+        _removeFromHistory();
+      }
+      
+      // Update current route to the previous one
+      if (_navigationHistory.isNotEmpty) {
+        _currentRoute = _navigationHistory.last;
+      }
+      
+      return true;
+    }
+    
+    // If we can't pop, check our history
+    if (_navigationHistory.length > 1) {
+      // Remove current route
       _removeFromHistory();
       
-      // Get previous route
+      // Get previous route and navigate to it
       if (_navigationHistory.isNotEmpty) {
         final previousRoute = _navigationHistory.last;
         _currentRoute = previousRoute;
-        
-        // Use pop if possible, otherwise go to previous route
-        if (context.canPop()) {
-          context.pop();
-        } else {
-          context.go(previousRoute);
-        }
+        context.go(previousRoute);
         return true;
       }
     }
     
-    // If we can't go back, navigate to home
-    navigateToHome(context);
+    // If we're not at home, go home
+    if (_currentRoute != '/' && _currentRoute != null) {
+      navigateToHome(context);
+      return false;
+    }
+    
+    // We're at home, allow exit
     return false;
   }
   
