@@ -1,6 +1,7 @@
 // Friend template entity
 // 
 // Defines different template types for friend entries
+// with support for custom fields
 
 import 'package:equatable/equatable.dart';
 
@@ -11,7 +12,74 @@ enum TemplateType {
   custom,
 }
 
-/// Friend template entity
+/// Enum for custom field types
+enum CustomFieldType {
+  text,
+  number,
+  date,
+  boolean,
+  select,
+  multiSelect,
+  url,
+  email,
+}
+
+/// Custom field definition
+class CustomField extends Equatable {
+  /// Unique identifier for the field
+  final String id;
+  
+  /// Field name (internal key)
+  final String name;
+  
+  /// Display label
+  final String label;
+  
+  /// Field type
+  final CustomFieldType type;
+  
+  /// Whether the field is required
+  final bool isRequired;
+  
+  /// Options for select/multiSelect fields
+  final List<String>? options;
+  
+  /// Placeholder text
+  final String? placeholder;
+  
+  /// Validation pattern (regex)
+  final String? validationPattern;
+  
+  /// Default value
+  final dynamic defaultValue;
+  
+  const CustomField({
+    required this.id,
+    required this.name,
+    required this.label,
+    required this.type,
+    this.isRequired = false,
+    this.options,
+    this.placeholder,
+    this.validationPattern,
+    this.defaultValue,
+  });
+  
+  @override
+  List<Object?> get props => [
+    id,
+    name,
+    label,
+    type,
+    isRequired,
+    options,
+    placeholder,
+    validationPattern,
+    defaultValue,
+  ];
+}
+
+/// Friend template entity with custom field support
 class FriendTemplate extends Equatable {
   /// Unique identifier for the template
   final String id;
@@ -28,6 +96,9 @@ class FriendTemplate extends Equatable {
   /// List of field names that are required in this template
   final List<String> requiredFields;
   
+  /// Custom fields defined for this template
+  final List<CustomField> customFields;
+  
   /// Whether this is a user-created custom template
   final bool isCustom;
   
@@ -40,6 +111,7 @@ class FriendTemplate extends Equatable {
     required this.type,
     required this.visibleFields,
     required this.requiredFields,
+    this.customFields = const [],
     required this.isCustom,
     required this.createdAt,
   });
@@ -66,6 +138,7 @@ class FriendTemplate extends Equatable {
         'notes',
       ],
       requiredFields: const ['name'],
+      customFields: const [],
       isCustom: false,
       createdAt: DateTime.now(),
     );
@@ -90,8 +163,32 @@ class FriendTemplate extends Equatable {
         'notes',
       ],
       requiredFields: const ['name'],
+      customFields: const [],
       isCustom: false,
       createdAt: DateTime.now(),
+    );
+  }
+  
+  /// Create a copy with modifications
+  FriendTemplate copyWith({
+    String? id,
+    String? name,
+    TemplateType? type,
+    List<String>? visibleFields,
+    List<String>? requiredFields,
+    List<CustomField>? customFields,
+    bool? isCustom,
+    DateTime? createdAt,
+  }) {
+    return FriendTemplate(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      visibleFields: visibleFields ?? this.visibleFields,
+      requiredFields: requiredFields ?? this.requiredFields,
+      customFields: customFields ?? this.customFields,
+      isCustom: isCustom ?? this.isCustom,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
   
@@ -102,6 +199,7 @@ class FriendTemplate extends Equatable {
     type,
     visibleFields,
     requiredFields,
+    customFields,
     isCustom,
     createdAt,
   ];

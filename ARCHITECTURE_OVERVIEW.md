@@ -1,237 +1,460 @@
 # Architecture Overview - MyFriends App
 
-## 🏗️ System Architecture
+## Version 0.3.0 - Refactored Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     MyFriends Mobile App                     │
-├─────────────────────────────────────────────────────────────┤
-│                    Presentation Layer                        │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
-│  │   Pages     │  │   Widgets   │  │    State    │         │
-│  │             │  │             │  │  Management │         │
-│  │ - Home      │  │ - Forms     │  │  (Riverpod) │         │
-│  │ - Friends   │  │ - Cards     │  │             │         │
-│  │ - Profile   │  │ - Dialogs   │  │ - Providers │         │
-│  │ - Settings  │  │ - Lists     │  │ - Notifiers │         │
-│  └─────────────┘  └─────────────┘  └─────────────┘         │
-├─────────────────────────────────────────────────────────────┤
-│                      Domain Layer                            │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
-│  │  Entities   │  │  Use Cases  │  │Repositories │         │
-│  │             │  │             │  │(Interfaces) │         │
-│  │ - Friend    │  │ - Add Friend│  │             │         │
-│  │ - Profile   │  │ - Get Friends│ │ - Friend    │         │
-│  │ - FriendBook│  │ - Share     │  │ - Profile   │         │
-│  │ - Template  │  │   Profile   │  │ - Template  │         │
-│  └─────────────┘  └─────────────┘  └─────────────┘         │
-├─────────────────────────────────────────────────────────────┤
-│                       Data Layer                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
-│  │   Models    │  │Repositories │  │Data Sources │         │
-│  │             │  │   (Impl)    │  │             │         │
-│  │ - FriendModel│ │             │  │ - Local DB  │         │
-│  │ - ProfileModel│ - FriendRepo │  │   (Hive)    │         │
-│  │ - TemplateModel│- ProfileRepo│  │ - Secure    │         │
-│  │             │  │             │  │   Storage   │         │
-│  └─────────────┘  └─────────────┘  └─────────────┘         │
-├─────────────────────────────────────────────────────────────┤
-│                      Core Services                           │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
-│  │Navigation│  │  Theme   │  │   i18n   │  │  Utils   │    │
-│  │GoRouter  │  │  System  │  │ (DE/EN)  │  │          │    │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘    │
-├─────────────────────────────────────────────────────────────┤
-│                    Platform Services                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
-│  │  Camera  │  │ Location │  │Permission│  │  Storage │    │
-│  │          │  │          │  │  Handler │  │          │    │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘    │
-└─────────────────────────────────────────────────────────────┘
+This document provides a comprehensive overview of the MyFriends app architecture after the v0.3.0 refactoring.
+
+## 🏗️ Core Architecture
+
+```mermaid
+graph TB
+    subgraph "Presentation Layer"
+        UI[UI Components]
+        Pages[Pages]
+        Widgets[Standardized Widgets]
+        Providers[Riverpod Providers]
+    end
+    
+    subgraph "Core Services v0.3.0"
+        NavService[Navigation Service]
+        NotifService[Notification Service]
+        PrefService[Preferences Service]
+        PhotoService[Photo Service]
+        LocationService[Location Service]
+        DBService[Database Service]
+    end
+    
+    subgraph "Domain Layer"
+        Entities[Enhanced Entities]
+        Repositories[Repository Interfaces]
+        UseCases[Use Cases]
+    end
+    
+    subgraph "Data Layer"
+        RepoImpl[Repository Implementations]
+        Models[Data Models]
+        LocalDB[Local Database/Hive]
+    end
+    
+    UI --> Pages
+    Pages --> Providers
+    Pages --> NavService
+    Pages --> NotifService
+    Providers --> UseCases
+    Providers --> PrefService
+    UseCases --> Repositories
+    Repositories --> RepoImpl
+    RepoImpl --> Models
+    RepoImpl --> LocalDB
+    Pages --> PhotoService
+    Pages --> LocationService
+    RepoImpl --> DBService
 ```
 
-## 📁 Project Structure
+## 📱 Navigation Flow with History Management
+
+```mermaid
+graph LR
+    Home[Home Page<br/>PopScope Handler]
+    AddFriend[Add Friend<br/>Smart Template]
+    FriendsList[Friends List]
+    FriendDetail[Friend Detail]
+    FriendBooks[Friend Books]
+    BookDetail[Book Detail]
+    Templates[Templates<br/>Custom Fields]
+    
+    Home -->|navigateTo| AddFriend
+    Home -->|navigateTo| FriendsList
+    Home -->|navigateTo| FriendBooks
+    Home -->|navigateTo| Templates
+    FriendsList -->|navigateTo| FriendDetail
+    FriendDetail -->|navigateTo| AddFriend
+    FriendBooks -->|navigateTo| BookDetail
+    
+    AddFriend -.->|navigateBack| Home
+    FriendsList -.->|navigateBack| Home
+    FriendDetail -.->|navigateBack| FriendsList
+    BookDetail -.->|navigateBack| FriendBooks
+```
+
+## 🔧 Service Architecture
+
+### 1. Navigation Service
+
+```mermaid
+classDiagram
+    class NavigationService {
+        -ListQueue~String~ navigationHistory
+        -String currentRoute
+        -int maxHistorySize = 20
+        +navigateTo(context, route, extra)
+        +navigateBack(context) bool
+        +navigateToHome(context)
+        +handleBackButton(context) Future~bool~
+        +canGoBack() bool
+        +clearHistory()
+        +initialize(initialRoute)
+        -addToHistory(route)
+        -removeFromHistory() String
+    }
+    
+    NavigationService --> "1" ListQueue : manages
+    NavigationService --> "1" BuildContext : uses
+```
+
+**Key Features:**
+- ✅ Navigation history stack (max 20 entries)
+- ✅ Android back button handling
+- ✅ Consistent navigation methods
+- ✅ Deep linking support
+- ✅ Route restoration
+
+### 2. Notification Service
+
+```mermaid
+classDiagram
+    class NotificationService {
+        -Queue~NotificationMessage~ notificationQueue
+        -GlobalKey~ScaffoldMessengerState~ messengerKey
+        -bool isShowingNotification
+        +showSuccess(message, duration?)
+        +showError(message, duration?)
+        +showWarning(message, duration?)
+        +showInfo(message, duration?)
+        +showNotification(message, type, duration, action?, actionLabel?)
+        +clearAll()
+        -processQueue()
+        -showSnackBar(notification)
+        -getNotificationColors(type)
+        -getNotificationIcon(type)
+    }
+    
+    class NotificationMessage {
+        +String message
+        +NotificationType type
+        +Duration duration
+        +VoidCallback? action
+        +String? actionLabel
+    }
+    
+    class NotificationType {
+        <<enumeration>>
+        success
+        error
+        warning
+        info
+    }
+    
+    NotificationService --> "*" NotificationMessage : queues
+    NotificationMessage --> "1" NotificationType : has
+```
+
+**Key Features:**
+- ✅ Centralized notification management
+- ✅ Queue system for multiple notifications
+- ✅ Consistent positioning below app bar
+- ✅ Different types with colors/icons
+- ✅ Support for action buttons
+
+### 3. Preferences Service
+
+```mermaid
+classDiagram
+    class PreferencesService {
+        -Box preferencesBox
+        +initialize() Future~void~
+        +getLastUsedTemplate() String?
+        +setLastUsedTemplate(templateId) Future~void~
+        +getThemeMode() String
+        +setThemeMode(mode) Future~void~
+        +getLanguageCode() String
+        +setLanguageCode(code) Future~void~
+        +isFirstLaunch() bool
+        +getPhotoQuality() String
+        +setPhotoQuality(quality) Future~void~
+        +getAutoSave() bool
+        +setAutoSave(autoSave) Future~void~
+        +getLastBackupDate() DateTime?
+        +setLastBackupDate(date) Future~void~
+        +exportPreferences() Map
+        +importPreferences(Map) Future~void~
+        +clearAll() Future~void~
+    }
+    
+    PreferencesService --> "1" HiveBox : uses
+```
+
+## 📋 Enhanced Template System
+
+```mermaid
+graph TB
+    subgraph "Template Architecture"
+        Template[FriendTemplate]
+        Classic[Classic Template<br/>Pre-defined Fields]
+        Modern[Modern Template<br/>Social Focus]
+        Custom[Custom Template<br/>User Defined]
+    end
+    
+    subgraph "Custom Field System"
+        CustomField[CustomField Entity]
+        Text[Text Field]
+        Number[Number Field]
+        Date[Date Field]
+        Bool[Boolean Field]
+        Select[Select Field]
+        MultiSelect[Multi-Select Field]
+        URL[URL Field]
+        Email[Email Field]
+    end
+    
+    Template --> Classic
+    Template --> Modern
+    Template --> Custom
+    Custom --> CustomField
+    CustomField --> Text
+    CustomField --> Number
+    CustomField --> Date
+    CustomField --> Bool
+    CustomField --> Select
+    CustomField --> MultiSelect
+    CustomField --> URL
+    CustomField --> Email
+```
+
+## 🔄 Data Flow with Centralized Services
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Page
+    participant StandardWidget
+    participant Service
+    participant Provider
+    participant Repository
+    participant Database
+    
+    User->>Page: Interact
+    Page->>StandardWidget: Use Component
+    StandardWidget->>Service: Call Service
+    Page->>Provider: Request Data
+    Provider->>Repository: Query/Update
+    Repository->>Database: Persist/Retrieve
+    Database-->>Repository: Return Data
+    Repository-->>Provider: Return Result
+    Provider-->>Page: Update State
+    Service-->>Page: Handle Navigation/Notification
+    Page-->>User: Display Result
+```
+
+## 🎨 Standardized UI Components
+
+```mermaid
+graph TD
+    subgraph "Reusable Components v0.3.0"
+        StandardAppBar[StandardAppBar<br/>• Back button handling<br/>• Consistent styling<br/>• Subtitle support]
+        ConsistentButton[ConsistentActionButton<br/>• 4 style types<br/>• 4 size variants<br/>• Loading states]
+        AppToast[AppToast<br/>• Themed colors<br/>• Icons per type<br/>• Action support]
+    end
+    
+    subgraph "Component Features"
+        BackNav[Back Navigation<br/>with History]
+        ButtonStyles[Primary/Secondary<br/>Danger/Text]
+        NotifTypes[Success/Error<br/>Warning/Info]
+    end
+    
+    StandardAppBar --> BackNav
+    ConsistentButton --> ButtonStyles
+    AppToast --> NotifTypes
+```
+
+## 🔀 State Management
+
+```mermaid
+graph TB
+    subgraph "Provider Architecture"
+        CoreProviders[Core Providers<br/>Singleton Services]
+        FeatureProviders[Feature Providers<br/>Business Logic]
+        StateNotifiers[State Notifiers<br/>Complex State]
+    end
+    
+    subgraph "Core Services"
+        NavProvider[navigationServiceProvider]
+        NotifProvider[notificationServiceProvider]
+        PrefProvider[preferencesServiceProvider]
+        MessengerKey[scaffoldMessengerKeyProvider]
+    end
+    
+    subgraph "Feature Services"
+        FriendsProvider[friendsProvider]
+        TemplateProvider[templateProvider]
+        BooksProvider[friendBooksProvider]
+    end
+    
+    CoreProviders --> NavProvider
+    CoreProviders --> NotifProvider
+    CoreProviders --> PrefProvider
+    CoreProviders --> MessengerKey
+    
+    FeatureProviders --> FriendsProvider
+    FeatureProviders --> TemplateProvider
+    FeatureProviders --> BooksProvider
+```
+
+## 🔙 Android Back Button Handling
+
+```mermaid
+flowchart TD
+    Start[Back Button Pressed<br/>PopScope Handler]
+    CheckHistory{Navigation<br/>History?}
+    NavigateBack[Navigate to<br/>Previous Page]
+    CheckHome{At Home<br/>Page?}
+    ShowToast[Show Exit<br/>Toast Message]
+    CheckDouble{Double Tap<br/>Within 2s?}
+    ExitApp[Exit<br/>Application]
+    StayInApp[Stay in App<br/>Reset Timer]
+    
+    Start --> CheckHistory
+    CheckHistory -->|Has History| NavigateBack
+    CheckHistory -->|No History| CheckHome
+    CheckHome -->|Yes| ShowToast
+    CheckHome -->|No| NavigateBack
+    ShowToast --> CheckDouble
+    CheckDouble -->|Yes| ExitApp
+    CheckDouble -->|No| StayInApp
+```
+
+## 📁 Project Structure v0.3.0
 
 ```
 lib/
-├── core/                       # Core functionality
-│   ├── constants/             # App constants
-│   │   ├── app_constants.dart
-│   │   └── storage_keys.dart
-│   ├── error/                # Error handling
-│   │   ├── exceptions.dart
-│   │   └── failures.dart
-│   ├── theme/                # Theme & styling
-│   │   ├── app_theme.dart
-│   │   ├── app_colors.dart
-│   │   └── app_typography.dart
-│   ├── utils/                # Utilities
-│   │   ├── validators.dart
-│   │   ├── formatters.dart
-│   │   └── extensions.dart
-│   └── widgets/              # Shared widgets
-│       ├── buttons/
-│       ├── inputs/
-│       └── dialogs/
-│
-├── features/                  # Feature modules
-│   ├── auth/                 # Authentication
-│   ├── friend/               # Friend management
-│   ├── friendbook/           # Friend books
-│   ├── profile/              # User profile
-│   └── settings/             # App settings
-│
-├── l10n/                     # Localization
-│   ├── app_de.arb           # German translations
-│   └── app_en.arb           # English translations
-│
-└── main.dart                 # App entry point
+├── main.dart                          # Enhanced entry point
+├── core/                              # Core functionality
+│   ├── navigation/                    # Navigation setup
+│   │   └── app_router.dart
+│   ├── services/                      # Centralized services (NEW)
+│   │   ├── navigation_service.dart    # Navigation with history
+│   │   ├── notification_service.dart  # Unified notifications
+│   │   ├── preferences_service.dart   # User preferences
+│   │   ├── database_service.dart
+│   │   ├── location_service.dart
+│   │   └── photo_service.dart
+│   ├── providers/                     # Core providers (NEW)
+│   │   └── core_providers.dart        # Service injection
+│   ├── widgets/                       # Standardized widgets (NEW)
+│   │   ├── standard_app_bar.dart      # Consistent app bar
+│   │   ├── consistent_action_button.dart # Unified buttons
+│   │   └── app_toast.dart            # Toast notifications
+│   └── theme/                         # Theme configuration
+│       ├── app_theme.dart
+│       ├── app_colors.dart
+│       └── app_typography.dart
+├── features/                          # Feature modules
+│   ├── friend/                        # Friend management
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   ├── friend.dart
+│   │   │   │   └── friend_template.dart # Enhanced with custom fields
+│   │   │   └── repositories/
+│   │   ├── data/
+│   │   │   ├── models/
+│   │   │   └── repositories/
+│   │   └── presentation/
+│   │       ├── pages/
+│   │       │   ├── add_friend_page.dart # Smart template selection
+│   │       │   ├── friend_detail_page.dart
+│   │       │   └── friends_list_page.dart
+│   │       ├── widgets/
+│   │       └── providers/
+│   ├── home/                          # Home with PopScope
+│   │   └── presentation/
+│   │       └── pages/
+│   │           └── home_page.dart     # Android back handling
+│   ├── friendbook/                    # Friend book feature
+│   └── template/                      # Template management
+│       └── presentation/
+│           └── pages/
+│               └── template_management_page.dart # Custom fields UI
+└── l10n/                              # Localization (DE/EN)
 ```
 
-## 🔄 Data Flow
+## 🚀 Key Improvements in v0.3.0
 
+### Core Services
+1. **Navigation Service**: Centralized navigation with history stack
+2. **Notification Service**: Unified toast/snackbar system
+3. **Preferences Service**: Persistent user settings
+
+### UI/UX Enhancements
+1. **Android Back Button**: Proper handling with navigation queue
+2. **Consistent Components**: Standardized app bars and buttons
+3. **Smart Features**: Last used template auto-selection
+4. **Custom Fields**: 8 field types for template customization
+
+### Code Quality
+1. **Dependency Injection**: Runtime injection via Riverpod
+2. **Separation of Concerns**: Clear service boundaries
+3. **Error Handling**: Centralized through notification service
+4. **Code Reusability**: Shared components and services
+
+## 💻 Development Guidelines
+
+### Adding New Features
+
+```dart
+// 1. Create feature structure
+lib/features/new_feature/
+├── domain/
+├── data/
+└── presentation/
+
+// 2. Use centralized services
+final navigationService = ref.read(navigationServiceProvider);
+final notificationService = ref.read(notificationServiceProvider);
+final preferencesService = ref.read(preferencesServiceProvider);
+
+// 3. Use standardized components
+StandardAppBar(title: 'Page Title')
+ConsistentActionButton(label: 'Action', style: ActionButtonStyle.primary)
 ```
-User Action → UI Widget → Provider → Use Case → Repository → Data Source
-                ↑                         ↓
-                └─────── Response ────────┘
+
+### Service Usage Examples
+
+```dart
+// Navigation with history
+navigationService.navigateTo(context, '/route');
+navigationService.navigateBack(context);
+
+// Notifications
+notificationService.showSuccess('Operation successful');
+notificationService.showError('An error occurred');
+
+// Preferences
+await preferencesService.setLastUsedTemplate('modern');
+final template = preferencesService.getLastUsedTemplate();
 ```
 
-## 💾 Storage Strategy
+## 🔒 Security Considerations
 
-### Local Database (Hive)
-- **Friends Collection**: Stores friend entries
-- **Profile Collection**: User profile data
-- **Templates Collection**: Custom templates
-- **FriendBooks Collection**: Friend groups
-
-### Secure Storage
-- **Sensitive Data**: Encrypted using Flutter Secure Storage
-- **Media Files**: Stored in app-specific directories
-- **Cache**: Temporary data with automatic cleanup
-
-## 🔐 Security Architecture
-
-### Data Protection
-1. **Encryption at Rest**
-   - All sensitive data encrypted using AES-256
-   - Platform-specific secure storage APIs
-
-2. **Data Isolation**
-   - App sandboxing on both platforms
-   - No shared storage access
-
-3. **Permission Management**
-   - Runtime permission requests
-   - Graceful degradation without permissions
-
-## 🎨 UI/UX Architecture
-
-### Design System
-- **Material Design 3**: Primary design language
-- **Adaptive Components**: Platform-specific UI elements
-- **Responsive Layout**: Supports all screen sizes
-- **Dark Mode**: System-aware theme switching
-
-### Navigation
-- **GoRouter**: Declarative routing
-- **Deep Linking**: Support for app links
-- **Navigation Guards**: Route protection
-
-## 🌍 Internationalization
-
-### Implementation
-- **ARB Files**: Resource bundles for translations
-- **Dynamic Loading**: Language switching at runtime
-- **Fallback**: English as default language
+- ✅ Local data encryption via platform-specific secure storage
+- ✅ No sensitive data in plain preferences
+- ✅ Secure photo path resolution
+- ✅ Proper permission handling for camera/location
 
 ## ⚡ Performance Optimizations
 
-### Strategies
-1. **Lazy Loading**: On-demand feature loading
-2. **Image Optimization**: Compressed and cached images
-3. **Database Indexing**: Fast query performance
-4. **State Management**: Efficient UI updates
+- ✅ Lazy service initialization
+- ✅ Navigation history pruning (20 entries max)
+- ✅ Notification queue management
+- ✅ Efficient state management with Riverpod
+- ✅ Widget reusability for reduced rebuilds
 
-## 🧪 Testing Architecture
+## 🔮 Future Enhancements
 
-### Test Layers
-1. **Unit Tests**: Business logic validation
-2. **Widget Tests**: UI component testing
-3. **Integration Tests**: Feature flow testing
-4. **Performance Tests**: Load and stress testing
-
-### Coverage Goals
-- Minimum 80% code coverage
-- 100% coverage for critical paths
-
-## 📱 Platform-Specific Considerations
-
-### iOS
-- **Minimum Version**: iOS 12.0
-- **Frameworks**: UIKit integration for native features
-- **Signing**: Automatic code signing
-
-### Android
-- **Minimum SDK**: 21 (Android 5.0)
-- **Architecture**: Support for multiple ABIs
-- **ProGuard**: Code obfuscation for release builds
-
-## 🔄 State Management Pattern
-
-### Riverpod Architecture
-```dart
-// Provider Definition
-final friendsProvider = StateNotifierProvider<FriendsNotifier, List<Friend>>(
-  (ref) => FriendsNotifier(ref.read(friendRepositoryProvider)),
-);
-
-// State Notifier
-class FriendsNotifier extends StateNotifier<List<Friend>> {
-  final FriendRepository _repository;
-  
-  FriendsNotifier(this._repository) : super([]);
-  
-  Future<void> loadFriends() async {
-    state = await _repository.getAllFriends();
-  }
-}
-
-// UI Consumer
-Consumer(
-  builder: (context, ref, child) {
-    final friends = ref.watch(friendsProvider);
-    return FriendsList(friends: friends);
-  },
-)
-```
-
-## 🚀 Build & Deployment
-
-### Build Variants
-- **Development**: Debug build with dev tools
-- **Staging**: Release build with test endpoints
-- **Production**: Optimized release build
-
-### CI/CD Pipeline
-1. Code commit triggers build
-2. Automated testing suite
-3. Code quality checks
-4. Build generation
-5. Distribution to testers
-
-## 📊 Monitoring & Analytics
-
-### Error Tracking
-- Structured error logging
-- Crash reporting (opt-in)
-- Performance monitoring
-
-### User Analytics
-- Anonymous usage statistics (opt-in)
-- Feature adoption tracking
-- Performance metrics
-
----
-
-**Last Updated**: August 2025  
-**Version**: 1.0.0
+- [ ] Cloud synchronization service
+- [ ] Advanced search with filters
+- [ ] Export/Import functionality
+- [ ] Additional languages
+- [ ] Theme customization UI
+- [ ] Offline-first architecture
+- [ ] Analytics integration
+- [ ] Social sharing features

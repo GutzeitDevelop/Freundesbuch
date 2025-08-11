@@ -1,6 +1,7 @@
 // Add/Edit Friend page
 // 
 // Form for creating or editing friend entries
+// Version 0.3.0 - Enhanced with centralized services and smart features
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,9 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../core/services/location_service.dart';
 import '../../../../core/services/photo_service.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../../../core/widgets/standard_app_bar.dart';
+import '../../../../core/widgets/consistent_action_button.dart';
 import 'dart:io';
 import '../../domain/entities/friend.dart';
 import '../../domain/entities/friend_template.dart';
@@ -50,7 +54,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   double? _latitude;
   double? _longitude;
   bool _isFavorite = false;
-  String _selectedTemplate = 'classic';
+  late String _selectedTemplate;
   List<String> _selectedFriendBookIds = [];
   Friend? _existingFriend;
   bool _isLoadingLocation = false;
@@ -65,6 +69,19 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
     super.initState();
     if (isEditing) {
       _loadFriend();
+    } else {
+      _loadLastUsedTemplate();
+    }
+  }
+  
+  void _loadLastUsedTemplate() async {
+    // Load last used template from preferences
+    final preferencesService = ref.read(preferencesServiceProvider);
+    final lastTemplate = preferencesService.getLastUsedTemplate();
+    if (mounted) {
+      setState(() {
+        _selectedTemplate = lastTemplate ?? 'classic';
+      });
     }
   }
   
@@ -89,13 +106,11 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         if (!templateExists) {
           // Template was deleted, fallback to classic
           templateToUse = 'classic';
-          // Show a message to the user
+          // Show a message to the user using notification service
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Das ursprüngliche Template wurde gelöscht. Klassisches Template wird verwendet.'),
-                duration: Duration(seconds: 3),
-              ),
+            final notificationService = ref.read(notificationServiceProvider);
+            notificationService.showWarning(
+              'Das ursprüngliche Template wurde gelöscht. Klassisches Template wird verwendet.'
             );
           }
         }
@@ -216,16 +231,21 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
       }
       
       if (mounted) {
-        final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.friendSaved)),
-        );
+        // Save last used template
+        final preferencesService = ref.read(preferencesServiceProvider);
+        await preferencesService.setLastUsedTemplate(_selectedTemplate);
         
-        // If editing, go back to detail page, otherwise go to list
+        // Show success notification
+        final notificationService = ref.read(notificationServiceProvider);
+        final l10n = AppLocalizations.of(context)!;
+        notificationService.showSuccess(l10n.friendSaved);
+        
+        // Navigate appropriately
+        final navigationService = ref.read(navigationServiceProvider);
         if (isEditing) {
           context.go('/friends/${friend.id}');
         } else {
-          context.go(AppRouter.friendsList);
+          navigationService.navigateBack(context);
         }
       }
     }
