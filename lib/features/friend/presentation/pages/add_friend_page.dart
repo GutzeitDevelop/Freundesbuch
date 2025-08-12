@@ -696,11 +696,17 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         );
         
       case CustomFieldType.select:
+        // Initialize with default or existing value
+        final currentValue = _customFieldValues[field.name]?.toString() ?? 
+                           field.defaultValue?.toString();
+        // Only use value if it's in the options list
+        final validValue = (field.options?.contains(currentValue) ?? false) ? currentValue : null;
+        
         return DropdownButtonFormField<String>(
-          value: _customFieldValues[field.name]?.toString(),
+          value: validValue,
           decoration: InputDecoration(
             labelText: field.label,
-            hintText: field.placeholder,
+            hintText: field.placeholder ?? 'Bitte auswählen',
             prefixIcon: const Icon(Icons.list),
           ),
           items: field.options?.map((option) {
@@ -724,8 +730,12 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         
       case CustomFieldType.multiSelect:
         // For multi-select, we'll use a simple chips approach
-        final selectedItems = (_customFieldValues[field.name] as List<dynamic>?)
-            ?.cast<String>() ?? [];
+        // Create a new list to avoid modifying cast results
+        final storedValue = _customFieldValues[field.name];
+        final selectedItems = <String>[];
+        if (storedValue is List) {
+          selectedItems.addAll(storedValue.cast<String>());
+        }
         
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -746,12 +756,14 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                     selected: isSelected,
                     onSelected: (selected) {
                       setState(() {
+                        // Create new list for state update
+                        final newList = List<String>.from(selectedItems);
                         if (selected) {
-                          selectedItems.add(option);
+                          newList.add(option);
                         } else {
-                          selectedItems.remove(option);
+                          newList.remove(option);
                         }
-                        _customFieldValues[field.name] = selectedItems;
+                        _customFieldValues[field.name] = newList;
                       });
                     },
                   );

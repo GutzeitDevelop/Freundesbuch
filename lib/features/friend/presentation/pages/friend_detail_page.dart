@@ -11,8 +11,10 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../core/services/photo_service.dart';
 import '../../domain/entities/friend.dart';
+import '../../domain/entities/friend_template.dart';
 import '../providers/friends_provider.dart';
 import '../../../friendbook/presentation/providers/friend_books_provider.dart';
+import '../../../template/presentation/providers/template_provider.dart';
 
 /// Page displaying friend details
 class FriendDetailPage extends ConsumerStatefulWidget {
@@ -147,6 +149,60 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
         ],
       ),
     );
+  }
+  
+  Widget _buildCustomFieldDisplay(CustomField field, dynamic value) {
+    if (value == null) return const SizedBox.shrink();
+    
+    String displayValue;
+    IconData icon;
+    
+    switch (field.type) {
+      case CustomFieldType.boolean:
+        displayValue = value == true ? 'Ja' : 'Nein';
+        icon = value == true ? Icons.check_circle : Icons.cancel;
+        break;
+      case CustomFieldType.date:
+        if (value is DateTime) {
+          final dateFormat = DateFormat.yMMMMd(Localizations.localeOf(context).languageCode);
+          displayValue = dateFormat.format(value);
+        } else {
+          displayValue = value.toString();
+        }
+        icon = Icons.calendar_today;
+        break;
+      case CustomFieldType.multiSelect:
+        if (value is List) {
+          displayValue = value.join(', ');
+        } else {
+          displayValue = value.toString();
+        }
+        icon = Icons.checklist;
+        break;
+      case CustomFieldType.email:
+        displayValue = value.toString();
+        icon = Icons.email;
+        break;
+      case CustomFieldType.url:
+        displayValue = value.toString();
+        icon = Icons.link;
+        break;
+      case CustomFieldType.number:
+        displayValue = value.toString();
+        icon = Icons.numbers;
+        break;
+      case CustomFieldType.select:
+        displayValue = value.toString();
+        icon = Icons.list;
+        break;
+      case CustomFieldType.text:
+      default:
+        displayValue = value.toString();
+        icon = Icons.edit;
+        break;
+    }
+    
+    return _buildInfoRow(icon, field.label, displayValue);
   }
   
   @override
@@ -338,35 +394,74 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
                   ),
                   const SizedBox(height: 16),
                   
-                  // Contact information
-                  if (_friend!.phone != null || _friend!.email != null) ...[
-                    Text(
-                      'Kontakt',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildInfoRow(Icons.phone, l10n.phone, _friend!.phone),
-                    _buildInfoRow(Icons.email, l10n.email, _friend!.email),
-                    const Divider(height: 32),
-                  ],
-                  
-                  // Personal information
-                  if (_friend!.birthday != null || _friend!.homeLocation != null || _friend!.work != null) ...[
-                    Text(
-                      'Persönliches',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    if (_friend!.birthday != null)
-                      _buildInfoRow(
-                        Icons.cake,
-                        l10n.birthday,
-                        dateFormat.format(_friend!.birthday!),
-                      ),
-                    _buildInfoRow(Icons.home, l10n.homeLocation, _friend!.homeLocation),
-                    _buildInfoRow(Icons.work, l10n.work, _friend!.work),
-                    const Divider(height: 32),
-                  ],
+                  // Get template to know which fields to display
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final templatesAsync = ref.watch(templateProvider);
+                      return templatesAsync.when(
+                        data: (templates) {
+                          // Find the template for this friend
+                          final template = templates.firstWhere(
+                            (t) => t.id == _friend.templateType,
+                            orElse: () => FriendTemplate.classic(),
+                          );
+                          
+                          final widgets = <Widget>[];
+                          
+                          // Contact information (if in template)
+                          final hasContact = template.visibleFields.contains('phone') || 
+                                           template.visibleFields.contains('email');
+                          if (hasContact && (_friend.phone != null || _friend.email != null)) {
+                            widgets.add(Text(
+                              'Kontakt',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ));
+                            widgets.add(const SizedBox(height: 8));
+                            if (template.visibleFields.contains('phone')) {
+                              widgets.add(_buildInfoRow(Icons.phone, l10n.phone, _friend.phone));
+                            }
+                            if (template.visibleFields.contains('email')) {
+                              widgets.add(_buildInfoRow(Icons.email, l10n.email, _friend.email));
+                            }
+                            widgets.add(const Divider(height: 32));
+                          }
+                          
+                          // Personal information (if in template)
+                          final hasPersonal = template.visibleFields.contains('birthday') ||
+                                            template.visibleFields.contains('homeLocation') ||
+                                            template.visibleFields.contains('work');
+                          if (hasPersonal && (_friend.birthday != null || _friend.homeLocation != null || _friend.work != null)) {
+                            widgets.add(Text(
+                              'Persönliches',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ));
+                            widgets.add(const SizedBox(height: 8));
+                            if (template.visibleFields.contains('birthday') && _friend.birthday != null) {
+                              widgets.add(_buildInfoRow(
+                                Icons.cake,
+                                l10n.birthday,
+                                dateFormat.format(_friend.birthday!),
+                              ));
+                            }
+                            if (template.visibleFields.contains('homeLocation')) {
+                              widgets.add(_buildInfoRow(Icons.home, l10n.homeLocation, _friend.homeLocation));
+                            }
+                            if (template.visibleFields.contains('work')) {
+                              widgets.add(_buildInfoRow(Icons.work, l10n.work, _friend.work));
+                            }
+                            widgets.add(const Divider(height: 32));
+                          }
+                          
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: widgets,
+                          );
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                      );
+                    },
+                  ),
                   
                   // Friend books
                   Consumer(
@@ -396,7 +491,7 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
                                       color: bookColor,
                                     ),
                                     label: Text(book.name),
-                                    backgroundColor: bookColor.withOpacity(0.1),
+                                    backgroundColor: bookColor.withValues(alpha: 0.1),
                                     onPressed: () {
                                       context.go('/friendbooks/${book.id}');
                                     },
@@ -413,44 +508,94 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
                     },
                   ),
                   
-                  // Preferences
-                  if (_friend!.likes != null || _friend!.dislikes != null || 
-                      _friend!.hobbies != null || _friend!.favoriteColor != null) ...[
-                    Text(
-                      'Vorlieben',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildInfoRow(Icons.thumb_up, l10n.iLike, _friend!.likes),
-                    _buildInfoRow(Icons.thumb_down, l10n.iDontLike, _friend!.dislikes),
-                    _buildInfoRow(Icons.sports_soccer, l10n.hobbies, _friend!.hobbies),
-                    _buildInfoRow(Icons.palette, l10n.favoriteColor, _friend!.favoriteColor),
-                    const Divider(height: 32),
-                  ],
-                  
-                  // Social media
-                  if (_friend!.socialMedia != null) ...[
-                    _buildInfoRow(Icons.share, l10n.socialMedia, _friend!.socialMedia),
-                    const Divider(height: 32),
-                  ],
-                  
-                  // Notes
-                  if (_friend!.notes != null) ...[
-                    Text(
-                      l10n.notes,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(_friend!.notes!),
-                    ),
-                  ],
+                  // Preferences and other fields based on template
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final templatesAsync = ref.watch(templateProvider);
+                      return templatesAsync.when(
+                        data: (templates) {
+                          final template = templates.firstWhere(
+                            (t) => t.id == _friend.templateType,
+                            orElse: () => FriendTemplate.classic(),
+                          );
+                          
+                          final widgets = <Widget>[];
+                          
+                          // Preferences (if in template)
+                          final hasPreferences = template.visibleFields.contains('likes') ||
+                                               template.visibleFields.contains('dislikes') ||
+                                               template.visibleFields.contains('hobbies') ||
+                                               template.visibleFields.contains('favoriteColor');
+                          if (hasPreferences && (_friend.likes != null || _friend.dislikes != null || 
+                              _friend.hobbies != null || _friend.favoriteColor != null)) {
+                            widgets.add(Text(
+                              'Vorlieben',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ));
+                            widgets.add(const SizedBox(height: 8));
+                            if (template.visibleFields.contains('likes')) {
+                              widgets.add(_buildInfoRow(Icons.thumb_up, l10n.iLike, _friend.likes));
+                            }
+                            if (template.visibleFields.contains('dislikes')) {
+                              widgets.add(_buildInfoRow(Icons.thumb_down, l10n.iDontLike, _friend.dislikes));
+                            }
+                            if (template.visibleFields.contains('hobbies')) {
+                              widgets.add(_buildInfoRow(Icons.sports_soccer, l10n.hobbies, _friend.hobbies));
+                            }
+                            if (template.visibleFields.contains('favoriteColor')) {
+                              widgets.add(_buildInfoRow(Icons.palette, l10n.favoriteColor, _friend.favoriteColor));
+                            }
+                            widgets.add(const Divider(height: 32));
+                          }
+                          
+                          // Social media (if in template)
+                          if (template.visibleFields.contains('socialMedia') && _friend.socialMedia != null) {
+                            widgets.add(_buildInfoRow(Icons.share, l10n.socialMedia, _friend.socialMedia));
+                            widgets.add(const Divider(height: 32));
+                          }
+                          
+                          // Custom fields
+                          if (template.customFields.isNotEmpty && _friend.customFieldValues != null) {
+                            widgets.add(Text(
+                              'Benutzerdefinierte Felder',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ));
+                            widgets.add(const SizedBox(height: 8));
+                            for (final field in template.customFields) {
+                              final value = _friend.customFieldValues![field.name];
+                              widgets.add(_buildCustomFieldDisplay(field, value));
+                            }
+                            widgets.add(const Divider(height: 32));
+                          }
+                          
+                          // Notes (if in template) - always show at the end
+                          if (template.visibleFields.contains('notes') && _friend.notes != null) {
+                            widgets.add(Text(
+                              l10n.notes,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ));
+                            widgets.add(const SizedBox(height: 8));
+                            widgets.add(Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(_friend.notes!),
+                            ));
+                          }
+                          
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: widgets,
+                          );
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
