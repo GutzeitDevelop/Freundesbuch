@@ -87,6 +87,21 @@ class FriendModel extends HiveObject {
   @HiveField(24)
   final Map<String, dynamic>? customFieldValues;
   
+  @HiveField(25)
+  final double? currentLatitude;
+  
+  @HiveField(26)
+  final double? currentLongitude;
+  
+  @HiveField(27)
+  final bool isLocationSharingEnabled;
+  
+  @HiveField(28)
+  final String? statusEmoji;
+  
+  @HiveField(29)
+  final DateTime? lastLocationUpdate;
+  
   FriendModel({
     required this.id,
     required this.name,
@@ -113,6 +128,11 @@ class FriendModel extends HiveObject {
     required this.createdAt,
     required this.updatedAt,
     this.customFieldValues,
+    this.currentLatitude,
+    this.currentLongitude,
+    this.isLocationSharingEnabled = false,
+    this.statusEmoji,
+    this.lastLocationUpdate,
   });
   
   /// Creates a FriendModel from a Friend entity
@@ -143,6 +163,11 @@ class FriendModel extends HiveObject {
       createdAt: friend.createdAt,
       updatedAt: friend.updatedAt,
       customFieldValues: friend.customFieldValues,
+      currentLatitude: friend.currentLatitude,
+      currentLongitude: friend.currentLongitude,
+      isLocationSharingEnabled: friend.isLocationSharingEnabled,
+      statusEmoji: friend.statusEmoji,
+      lastLocationUpdate: friend.lastLocationUpdate,
     );
   }
   
@@ -174,6 +199,11 @@ class FriendModel extends HiveObject {
       createdAt: createdAt,
       updatedAt: updatedAt,
       customFieldValues: customFieldValues,
+      currentLatitude: currentLatitude,
+      currentLongitude: currentLongitude,
+      isLocationSharingEnabled: isLocationSharingEnabled,
+      statusEmoji: statusEmoji,
+      lastLocationUpdate: lastLocationUpdate,
     );
   }
   
@@ -203,6 +233,12 @@ class FriendModel extends HiveObject {
     bool? isFavorite,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Map<String, dynamic>? customFieldValues,
+    double? currentLatitude,
+    double? currentLongitude,
+    bool? isLocationSharingEnabled,
+    String? statusEmoji,
+    DateTime? lastLocationUpdate,
   }) {
     return FriendModel(
       id: id ?? this.id,
@@ -229,6 +265,12 @@ class FriendModel extends HiveObject {
       isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      customFieldValues: customFieldValues ?? this.customFieldValues,
+      currentLatitude: currentLatitude ?? this.currentLatitude,
+      currentLongitude: currentLongitude ?? this.currentLongitude,
+      isLocationSharingEnabled: isLocationSharingEnabled ?? this.isLocationSharingEnabled,
+      statusEmoji: statusEmoji ?? this.statusEmoji,
+      lastLocationUpdate: lastLocationUpdate ?? this.lastLocationUpdate,
     );
   }
   

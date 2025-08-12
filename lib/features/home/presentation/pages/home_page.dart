@@ -128,6 +128,18 @@ class _HomePageState extends ConsumerState<HomePage> {
               style: ActionButtonStyle.secondary,
               size: ActionButtonSize.large,
             ),
+            const SizedBox(height: 16),
+            
+            ConsistentActionButton(
+              label: 'Freunde Karte',
+              icon: Icons.map,
+              onPressed: () {
+                // Navigate to map view
+                navigationService.navigateTo(context, AppRouter.mapView);
+              },
+              style: ActionButtonStyle.secondary,
+              size: ActionButtonSize.large,
+            ),
             const SizedBox(height: 32),
             
             // Profile button

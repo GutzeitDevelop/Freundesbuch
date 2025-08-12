@@ -15,6 +15,7 @@ import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/profile/presentation/pages/profile_view_page.dart';
 import '../../features/profile/presentation/pages/profile_edit_page.dart';
 import '../../features/profile/domain/entities/user_profile.dart';
+import '../../features/map/presentation/pages/map_page.dart';
 
 /// Provider for the app router
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -33,6 +34,7 @@ class AppRouter {
   static const String templateManagement = '/templates';
   static const String profileView = '/profile';
   static const String profileEdit = '/profile/edit';
+  static const String mapView = '/map';
   
   /// Main router configuration
   static final GoRouter router = GoRouter(
@@ -123,6 +125,13 @@ class AppRouter {
             },
           ),
         ],
+      ),
+      
+      // Map view
+      GoRoute(
+        path: mapView,
+        name: 'mapView',
+        builder: (context, state) => const MapPage(),
       ),
     ],
     

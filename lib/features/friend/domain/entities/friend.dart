@@ -82,6 +82,21 @@ class Friend extends Equatable {
   /// Custom field values (field name -> value)
   final Map<String, dynamic>? customFieldValues;
   
+  /// Current latitude for location sharing (optional)
+  final double? currentLatitude;
+  
+  /// Current longitude for location sharing (optional)
+  final double? currentLongitude;
+  
+  /// Whether friend is sharing their location
+  final bool isLocationSharingEnabled;
+  
+  /// Single emoji status for map display (optional)
+  final String? statusEmoji;
+  
+  /// Last time location was updated (optional)
+  final DateTime? lastLocationUpdate;
+  
   const Friend({
     required this.id,
     required this.name,
@@ -108,6 +123,11 @@ class Friend extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     this.customFieldValues,
+    this.currentLatitude,
+    this.currentLongitude,
+    this.isLocationSharingEnabled = false,
+    this.statusEmoji,
+    this.lastLocationUpdate,
   });
   
   /// Creates a copy of this friend with the given fields replaced
@@ -137,6 +157,11 @@ class Friend extends Equatable {
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? customFieldValues,
+    double? currentLatitude,
+    double? currentLongitude,
+    bool? isLocationSharingEnabled,
+    String? statusEmoji,
+    DateTime? lastLocationUpdate,
   }) {
     return Friend(
       id: id ?? this.id,
@@ -164,6 +189,11 @@ class Friend extends Equatable {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       customFieldValues: customFieldValues ?? this.customFieldValues,
+      currentLatitude: currentLatitude ?? this.currentLatitude,
+      currentLongitude: currentLongitude ?? this.currentLongitude,
+      isLocationSharingEnabled: isLocationSharingEnabled ?? this.isLocationSharingEnabled,
+      statusEmoji: statusEmoji ?? this.statusEmoji,
+      lastLocationUpdate: lastLocationUpdate ?? this.lastLocationUpdate,
     );
   }
   
@@ -194,5 +224,10 @@ class Friend extends Equatable {
     createdAt,
     updatedAt,
     customFieldValues,
+    currentLatitude,
+    currentLongitude,
+    isLocationSharingEnabled,
+    statusEmoji,
+    lastLocationUpdate,
   ];
 }
