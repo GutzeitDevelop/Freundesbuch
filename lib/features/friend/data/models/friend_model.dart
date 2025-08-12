@@ -84,6 +84,9 @@ class FriendModel extends HiveObject {
   @HiveField(23)
   final DateTime updatedAt;
   
+  @HiveField(24)
+  final Map<String, dynamic>? customFieldValues;
+  
   FriendModel({
     required this.id,
     required this.name,
@@ -109,6 +112,7 @@ class FriendModel extends HiveObject {
     required this.isFavorite,
     required this.createdAt,
     required this.updatedAt,
+    this.customFieldValues,
   });
   
   /// Creates a FriendModel from a Friend entity
@@ -138,6 +142,7 @@ class FriendModel extends HiveObject {
       isFavorite: friend.isFavorite,
       createdAt: friend.createdAt,
       updatedAt: friend.updatedAt,
+      customFieldValues: friend.customFieldValues,
     );
   }
   
@@ -168,6 +173,7 @@ class FriendModel extends HiveObject {
       isFavorite: isFavorite,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      customFieldValues: customFieldValues,
     );
   }
   

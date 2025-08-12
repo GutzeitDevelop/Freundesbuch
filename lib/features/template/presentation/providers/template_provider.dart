@@ -37,6 +37,7 @@ class TemplateNotifier extends StateNotifier<AsyncValue<List<FriendTemplate>>> {
     required String name,
     required List<String> visibleFields,
     required List<String> requiredFields,
+    List<CustomField>? customFields,
   }) async {
     try {
       // Check if name already exists
@@ -50,6 +51,7 @@ class TemplateNotifier extends StateNotifier<AsyncValue<List<FriendTemplate>>> {
         type: TemplateType.custom,
         visibleFields: visibleFields,
         requiredFields: requiredFields,
+        customFields: customFields ?? [],
         isCustom: true,
         createdAt: DateTime.now(),
       );

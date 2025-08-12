@@ -34,6 +34,9 @@ class TemplateModel extends HiveObject {
   @HiveField(7)
   final DateTime updatedAt;
   
+  @HiveField(8)
+  final List<Map<String, dynamic>>? customFields;
+  
   TemplateModel({
     required this.id,
     required this.name,
@@ -43,6 +46,7 @@ class TemplateModel extends HiveObject {
     required this.isCustom,
     required this.createdAt,
     required this.updatedAt,
+    this.customFields,
   });
   
   /// Convert from entity to model
@@ -56,6 +60,17 @@ class TemplateModel extends HiveObject {
       isCustom: template.isCustom,
       createdAt: template.createdAt,
       updatedAt: DateTime.now(),
+      customFields: template.customFields.isEmpty ? null : template.customFields.map((field) => {
+        'id': field.id,
+        'name': field.name,
+        'label': field.label,
+        'type': field.type.index,
+        'isRequired': field.isRequired,
+        'options': field.options,
+        'placeholder': field.placeholder,
+        'validationPattern': field.validationPattern,
+        'defaultValue': field.defaultValue,
+      }).toList(),
     );
   }
   
@@ -72,6 +87,19 @@ class TemplateModel extends HiveObject {
       requiredFields: List<String>.from(requiredFields),
       isCustom: isCustom,
       createdAt: createdAt,
+      customFields: customFields?.map((fieldMap) => CustomField(
+        id: fieldMap['id'] as String,
+        name: fieldMap['name'] as String,
+        label: fieldMap['label'] as String,
+        type: CustomFieldType.values[fieldMap['type'] as int],
+        isRequired: fieldMap['isRequired'] as bool? ?? false,
+        options: fieldMap['options'] != null 
+            ? List<String>.from(fieldMap['options'] as List)
+            : null,
+        placeholder: fieldMap['placeholder'] as String?,
+        validationPattern: fieldMap['validationPattern'] as String?,
+        defaultValue: fieldMap['defaultValue'],
+      )).toList() ?? [],
     );
   }
 }

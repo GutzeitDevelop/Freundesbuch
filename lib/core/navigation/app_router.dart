@@ -12,6 +12,9 @@ import '../../features/friendbook/presentation/pages/friend_books_list_page.dart
 import '../../features/friendbook/presentation/pages/friend_book_detail_page.dart';
 import '../../features/template/presentation/pages/template_management_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/profile/presentation/pages/profile_view_page.dart';
+import '../../features/profile/presentation/pages/profile_edit_page.dart';
+import '../../features/profile/domain/entities/user_profile.dart';
 
 /// Provider for the app router
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -28,6 +31,8 @@ class AppRouter {
   static const String friendBooksList = '/friendbooks';
   static const String friendBookDetail = '/friendbooks/:id';
   static const String templateManagement = '/templates';
+  static const String profileView = '/profile';
+  static const String profileEdit = '/profile/edit';
   
   /// Main router configuration
   static final GoRouter router = GoRouter(
@@ -100,6 +105,24 @@ class AppRouter {
         path: templateManagement,
         name: 'templateManagement',
         builder: (context, state) => const TemplateManagementPage(),
+      ),
+      
+      // Profile
+      GoRoute(
+        path: profileView,
+        name: 'profileView',
+        builder: (context, state) => const ProfileViewPage(),
+        routes: [
+          // Edit profile
+          GoRoute(
+            path: 'edit',
+            name: 'profileEdit',
+            builder: (context, state) {
+              final profile = state.extra;
+              return ProfileEditPage(existingProfile: profile as UserProfile?);
+            },
+          ),
+        ],
       ),
     ],
     

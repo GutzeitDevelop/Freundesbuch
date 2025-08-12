@@ -128,6 +128,19 @@ class _HomePageState extends ConsumerState<HomePage> {
               style: ActionButtonStyle.secondary,
               size: ActionButtonSize.large,
             ),
+            const SizedBox(height: 32),
+            
+            // Profile button
+            ConsistentActionButton(
+              label: 'Mein Profil',
+              icon: Icons.account_circle,
+              onPressed: () {
+                // Navigate to profile page
+                navigationService.navigateTo(context, AppRouter.profileView);
+              },
+              style: ActionButtonStyle.text,
+              size: ActionButtonSize.medium,
+            ),
           ],
         ),
       ),

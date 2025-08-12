@@ -112,7 +112,7 @@ class TemplateManagementPage extends ConsumerWidget {
               children: [
                 Chip(
                   label: Text(
-                    '${template.visibleFields.length} Felder',
+                    '${template.visibleFields.length + template.customFields.length} Felder',
                     style: theme.textTheme.labelSmall,
                   ),
                   visualDensity: VisualDensity.compact,

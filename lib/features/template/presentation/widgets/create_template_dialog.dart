@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../friend/domain/entities/friend_template.dart';
 import '../providers/template_provider.dart';
+import 'custom_field_editor.dart';
 
 /// Dialog for creating or editing custom templates
 class CreateTemplateDialog extends ConsumerStatefulWidget {
@@ -47,6 +48,9 @@ class _CreateTemplateDialogState extends ConsumerState<CreateTemplateDialog> {
   // Selected required fields
   Set<String> _requiredFields = {'name'}; // Name is always required
   
+  // Custom fields
+  List<CustomField> _customFields = [];
+  
   bool get isEditing => widget.template != null;
   
   @override
@@ -56,6 +60,7 @@ class _CreateTemplateDialogState extends ConsumerState<CreateTemplateDialog> {
       _nameController.text = widget.template!.name;
       _visibleFields = Set<String>.from(widget.template!.visibleFields);
       _requiredFields = Set<String>.from(widget.template!.requiredFields);
+      _customFields = List<CustomField>.from(widget.template!.customFields);
     }
   }
   
@@ -82,6 +87,7 @@ class _CreateTemplateDialogState extends ConsumerState<CreateTemplateDialog> {
             type: TemplateType.custom,
             visibleFields: _visibleFields.toList(),
             requiredFields: _requiredFields.toList(),
+            customFields: _customFields,
             isCustom: true,
             createdAt: widget.template!.createdAt,
           );
@@ -91,6 +97,7 @@ class _CreateTemplateDialogState extends ConsumerState<CreateTemplateDialog> {
             name: _nameController.text.trim(),
             visibleFields: _visibleFields.toList(),
             requiredFields: _requiredFields.toList(),
+            customFields: _customFields,
           );
         }
         
@@ -261,6 +268,108 @@ class _CreateTemplateDialogState extends ConsumerState<CreateTemplateDialog> {
                           }).toList(),
                         ),
                       ),
+                      const SizedBox(height: 24),
+                      
+                      // Custom fields section
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Benutzerdefinierte Felder',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.add_circle),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => CustomFieldEditorDialog(
+                                  onSave: (field) {
+                                    setState(() {
+                                      _customFields.add(field);
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                            tooltip: 'Feld hinzufügen',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      
+                      // Custom fields list
+                      if (_customFields.isEmpty) ...[
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.outline.withAlpha(128),
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.extension_off,
+                                  size: 48,
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(128),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Keine benutzerdefinierten Felder',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Füge eigene Felder hinzu, um das Template zu erweitern',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ] else ...[
+                        Container(
+                          constraints: BoxConstraints(
+                            maxHeight: 200,
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _customFields.length,
+                            itemBuilder: (context, index) {
+                              final field = _customFields[index];
+                              return CustomFieldListTile(
+                                field: field,
+                                onEdit: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => CustomFieldEditorDialog(
+                                      field: field,
+                                      onSave: (updatedField) {
+                                        setState(() {
+                                          _customFields[index] = updatedField;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                },
+                                onDelete: () {
+                                  setState(() {
+                                    _customFields.removeAt(index);
+                                  });
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       
                       // Info text

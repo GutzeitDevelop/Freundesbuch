@@ -62,6 +62,10 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
   final PhotoService _photoService = PhotoService();
   bool _isLoadingPhoto = false;
   
+  // Custom field controllers
+  final Map<String, TextEditingController> _customFieldControllers = {};
+  final Map<String, dynamic> _customFieldValues = {};
+  
   bool get isEditing => widget.friendId != null;
   
   @override
@@ -139,6 +143,12 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         _isFavorite = friend.isFavorite;
         _selectedTemplate = templateToUse;
         _selectedFriendBookIds = List<String>.from(friend.friendBookIds);
+        
+        // Load custom field values
+        if (friend.customFieldValues != null) {
+          _customFieldValues.clear();
+          _customFieldValues.addAll(friend.customFieldValues!);
+        }
       });
     }
   }
@@ -158,6 +168,10 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
     _socialMediaController.dispose();
     _notesController.dispose();
     _firstMetLocationController.dispose();
+    // Dispose custom field controllers
+    for (final controller in _customFieldControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
   
@@ -193,6 +207,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         isFavorite: _isFavorite,
         createdAt: _existingFriend?.createdAt ?? now,
         updatedAt: now,
+        customFieldValues: _customFieldValues.isNotEmpty ? _customFieldValues : null,
       );
       
       await ref.read(friendsProvider.notifier).saveFriend(friend);
@@ -546,6 +561,208 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
     }
   }
   
+  Widget? _buildCustomFieldWidget(CustomField field) {
+    // Get or create controller
+    if (!_customFieldControllers.containsKey(field.id)) {
+      _customFieldControllers[field.id] = TextEditingController(
+        text: _customFieldValues[field.name]?.toString() ?? field.defaultValue?.toString() ?? '',
+      );
+    }
+    
+    final controller = _customFieldControllers[field.id]!;
+    
+    switch (field.type) {
+      case CustomFieldType.text:
+        return TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: field.label,
+            hintText: field.placeholder,
+            prefixIcon: const Icon(Icons.edit),
+          ),
+          validator: field.isRequired ? (value) {
+            if (value == null || value.trim().isEmpty) {
+              return '${field.label} ist erforderlich';
+            }
+            return null;
+          } : null,
+          onChanged: (value) {
+            _customFieldValues[field.name] = value;
+          },
+        );
+        
+      case CustomFieldType.number:
+        return TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: field.label,
+            hintText: field.placeholder,
+            prefixIcon: const Icon(Icons.numbers),
+          ),
+          keyboardType: TextInputType.number,
+          validator: field.isRequired ? (value) {
+            if (value == null || value.trim().isEmpty) {
+              return '${field.label} ist erforderlich';
+            }
+            return null;
+          } : null,
+          onChanged: (value) {
+            _customFieldValues[field.name] = value.isNotEmpty ? num.tryParse(value) : null;
+          },
+        );
+        
+      case CustomFieldType.email:
+        return TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: field.label,
+            hintText: field.placeholder,
+            prefixIcon: const Icon(Icons.email),
+          ),
+          keyboardType: TextInputType.emailAddress,
+          validator: (value) {
+            if (field.isRequired && (value == null || value.trim().isEmpty)) {
+              return '${field.label} ist erforderlich';
+            }
+            if (value != null && value.isNotEmpty && !value.contains('@')) {
+              return 'Bitte gültige E-Mail-Adresse eingeben';
+            }
+            return null;
+          },
+          onChanged: (value) {
+            _customFieldValues[field.name] = value;
+          },
+        );
+        
+      case CustomFieldType.url:
+        return TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: field.label,
+            hintText: field.placeholder,
+            prefixIcon: const Icon(Icons.link),
+          ),
+          keyboardType: TextInputType.url,
+          validator: field.isRequired ? (value) {
+            if (value == null || value.trim().isEmpty) {
+              return '${field.label} ist erforderlich';
+            }
+            return null;
+          } : null,
+          onChanged: (value) {
+            _customFieldValues[field.name] = value;
+          },
+        );
+        
+      case CustomFieldType.boolean:
+        return SwitchListTile(
+          title: Text(field.label),
+          subtitle: field.placeholder != null ? Text(field.placeholder!) : null,
+          value: _customFieldValues[field.name] ?? field.defaultValue ?? false,
+          onChanged: (value) {
+            setState(() {
+              _customFieldValues[field.name] = value;
+            });
+          },
+        );
+        
+      case CustomFieldType.date:
+        return InkWell(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: _customFieldValues[field.name] ?? DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime(2100),
+            );
+            if (date != null) {
+              setState(() {
+                _customFieldValues[field.name] = date;
+                controller.text = '${date.day}.${date.month}.${date.year}';
+              });
+            }
+          },
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelText: field.label,
+              hintText: field.placeholder,
+              prefixIcon: const Icon(Icons.calendar_today),
+              suffixIcon: const Icon(Icons.arrow_drop_down),
+            ),
+            child: Text(
+              controller.text.isEmpty ? 'Datum auswählen' : controller.text,
+            ),
+          ),
+        );
+        
+      case CustomFieldType.select:
+        return DropdownButtonFormField<String>(
+          value: _customFieldValues[field.name]?.toString(),
+          decoration: InputDecoration(
+            labelText: field.label,
+            hintText: field.placeholder,
+            prefixIcon: const Icon(Icons.list),
+          ),
+          items: field.options?.map((option) {
+            return DropdownMenuItem(
+              value: option,
+              child: Text(option),
+            );
+          }).toList() ?? [],
+          validator: field.isRequired ? (value) {
+            if (value == null || value.isEmpty) {
+              return '${field.label} ist erforderlich';
+            }
+            return null;
+          } : null,
+          onChanged: (value) {
+            setState(() {
+              _customFieldValues[field.name] = value;
+            });
+          },
+        );
+        
+      case CustomFieldType.multiSelect:
+        // For multi-select, we'll use a simple chips approach
+        final selectedItems = (_customFieldValues[field.name] as List<dynamic>?)
+            ?.cast<String>() ?? [];
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InputDecorator(
+              decoration: InputDecoration(
+                labelText: field.label,
+                hintText: field.placeholder,
+                prefixIcon: const Icon(Icons.checklist),
+              ),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: field.options?.map((option) {
+                  final isSelected = selectedItems.contains(option);
+                  return FilterChip(
+                    label: Text(option),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() {
+                        if (selected) {
+                          selectedItems.add(option);
+                        } else {
+                          selectedItems.remove(option);
+                        }
+                        _customFieldValues[field.name] = selectedItems;
+                      });
+                    },
+                  );
+                }).toList() ?? [],
+              ),
+            ),
+          ],
+        );
+    }
+  }
+  
   List<Widget> _buildFormFields() {
     final l10n = AppLocalizations.of(context)!;
     
@@ -760,6 +977,36 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
     );
     widgets.add(const SizedBox(height: 16));
     
+    // Add custom fields if template has them
+    if (template.customFields.isNotEmpty) {
+      // Add section header
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              Icon(Icons.dashboard_customize, color: Theme.of(context).colorScheme.primary),
+              const SizedBox(width: 8),
+              Text(
+                'Benutzerdefinierte Felder',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ],
+          ),
+        ),
+      );
+      widgets.add(const SizedBox(height: 8));
+      
+      // Add each custom field
+      for (final field in template.customFields) {
+        final widget = _buildCustomFieldWidget(field);
+        if (widget != null) {
+          widgets.add(widget);
+          widgets.add(const SizedBox(height: 16));
+        }
+      }
+    }
+    
     // FriendBooks selection
     widgets.add(_buildFriendBooksSection());
     
@@ -878,10 +1125,10 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                   }
                 }
               },
-              child: Text(l10n.cancel),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
               ),
+              child: Text(l10n.cancel),
             ),
           ],
         ),

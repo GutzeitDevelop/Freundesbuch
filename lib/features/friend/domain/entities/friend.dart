@@ -79,6 +79,9 @@ class Friend extends Equatable {
   /// Date when the friend was last updated
   final DateTime updatedAt;
   
+  /// Custom field values (field name -> value)
+  final Map<String, dynamic>? customFieldValues;
+  
   const Friend({
     required this.id,
     required this.name,
@@ -104,6 +107,7 @@ class Friend extends Equatable {
     required this.isFavorite,
     required this.createdAt,
     required this.updatedAt,
+    this.customFieldValues,
   });
   
   /// Creates a copy of this friend with the given fields replaced
@@ -132,6 +136,7 @@ class Friend extends Equatable {
     bool? isFavorite,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Map<String, dynamic>? customFieldValues,
   }) {
     return Friend(
       id: id ?? this.id,
@@ -158,6 +163,7 @@ class Friend extends Equatable {
       isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      customFieldValues: customFieldValues ?? this.customFieldValues,
     );
   }
   
@@ -187,5 +193,6 @@ class Friend extends Equatable {
     isFavorite,
     createdAt,
     updatedAt,
+    customFieldValues,
   ];
 }
