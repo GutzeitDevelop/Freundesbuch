@@ -12,6 +12,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/widgets/standard_app_bar.dart';
 import '../../../../core/widgets/consistent_action_button.dart';
+import '../../../../core/widgets/field_display_widget.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/user_profile.dart';
 import '../providers/profile_provider.dart';
@@ -40,44 +41,6 @@ class ProfileViewPage extends ConsumerWidget {
     );
   }
   
-  Widget _buildInfoTile(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String? value,
-    VoidCallback? onTap,
-    bool copyable = false,
-  }) {
-    if (value == null || value.isEmpty) return const SizedBox.shrink();
-    
-    return ListTile(
-      leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-      title: Text(title),
-      subtitle: Text(value),
-      onTap: copyable
-          ? () {
-              Clipboard.setData(ClipboardData(text: value));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('$title kopiert')),
-              );
-            }
-          : onTap,
-      trailing: copyable ? const Icon(Icons.copy, size: 16) : null,
-    );
-  }
-  
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
   
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -239,64 +202,55 @@ class ProfileViewPage extends ConsumerWidget {
                 ),
                 
                 // Basic Information
-                _buildSectionHeader(context, 'Grundinformationen'),
-                if (profile.birthday != null)
-                  _buildInfoTile(
-                    context,
-                    icon: Icons.cake,
-                    title: 'Geburtstag',
-                    value: DateFormat('dd.MM.yyyy').format(profile.birthday!),
-                  ),
+                const FieldSectionHeader(title: 'Grundinformationen'),
+                DateFieldDisplay(
+                  icon: Icons.cake,
+                  label: 'Geburtstag',
+                  date: profile.birthday,
+                ),
                 
                 // Contact Information
-                if (profile.phone != null || profile.email != null || profile.homeLocation != null)
-                  _buildSectionHeader(context, 'Kontakt'),
-                _buildInfoTile(
-                  context,
+                if (profile.phone != null || profile.email != null || profile.homeLocation != null || profile.work != null)
+                  const FieldSectionHeader(title: 'Kontakt'),
+                FieldDisplayWidget(
                   icon: Icons.phone,
-                  title: 'Telefon',
+                  label: 'Telefon',
                   value: profile.phone,
                   copyable: true,
                 ),
-                _buildInfoTile(
-                  context,
+                FieldDisplayWidget(
                   icon: Icons.email,
-                  title: 'E-Mail',
+                  label: 'E-Mail',
                   value: profile.email,
                   copyable: true,
                 ),
-                _buildInfoTile(
-                  context,
+                FieldDisplayWidget(
                   icon: Icons.home,
-                  title: 'Wohnort',
+                  label: 'Wohnort',
                   value: profile.homeLocation,
                 ),
-                _buildInfoTile(
-                  context,
+                FieldDisplayWidget(
                   icon: Icons.work,
-                  title: 'Beruf',
+                  label: 'Beruf',
                   value: profile.work,
                 ),
                 
                 // Personal Preferences
                 if (profile.likes != null || profile.dislikes != null || profile.hobbies != null)
-                  _buildSectionHeader(context, 'Persönliches'),
-                _buildInfoTile(
-                  context,
+                  const FieldSectionHeader(title: 'Persönliches'),
+                FieldDisplayWidget(
                   icon: Icons.favorite,
-                  title: 'Ich mag',
+                  label: 'Ich mag',
                   value: profile.likes,
                 ),
-                _buildInfoTile(
-                  context,
+                FieldDisplayWidget(
                   icon: Icons.heart_broken,
-                  title: 'Ich mag nicht',
+                  label: 'Ich mag nicht',
                   value: profile.dislikes,
                 ),
-                _buildInfoTile(
-                  context,
+                FieldDisplayWidget(
                   icon: Icons.sports_soccer,
-                  title: 'Hobbys',
+                  label: 'Hobbys',
                   value: profile.hobbies,
                 ),
                 
@@ -305,35 +259,31 @@ class ProfileViewPage extends ConsumerWidget {
                     profile.favoriteMovies != null || 
                     profile.favoriteBooks != null || 
                     profile.favoriteFood != null)
-                  _buildSectionHeader(context, 'Favoriten'),
-                _buildInfoTile(
-                  context,
+                  const FieldSectionHeader(title: 'Favoriten'),
+                FieldDisplayWidget(
                   icon: Icons.music_note,
-                  title: 'Lieblingsmusik',
+                  label: 'Lieblingsmusik',
                   value: profile.favoriteMusic,
                 ),
-                _buildInfoTile(
-                  context,
+                FieldDisplayWidget(
                   icon: Icons.movie,
-                  title: 'Lieblingsfilme',
+                  label: 'Lieblingsfilme',
                   value: profile.favoriteMovies,
                 ),
-                _buildInfoTile(
-                  context,
+                FieldDisplayWidget(
                   icon: Icons.book,
-                  title: 'Lieblingsbücher',
+                  label: 'Lieblingsbücher',
                   value: profile.favoriteBooks,
                 ),
-                _buildInfoTile(
-                  context,
+                FieldDisplayWidget(
                   icon: Icons.restaurant,
-                  title: 'Lieblingsessen',
+                  label: 'Lieblingsessen',
                   value: profile.favoriteFood,
                 ),
                 
                 // Motto
                 if (profile.motto != null) ...[
-                  _buildSectionHeader(context, 'Lebensmotto'),
+                  const FieldSectionHeader(title: 'Lebensmotto'),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Card(

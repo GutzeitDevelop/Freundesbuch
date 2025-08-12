@@ -101,10 +101,16 @@ class _CustomFieldEditorDialogState extends State<CustomFieldEditorDialog> {
   }
   
   void _saveField() {
-    if (_formKey.currentState!.validate()) {
+    // Validate form
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    
+    try {
       final label = _labelController.text.trim();
-      final name = label.toLowerCase().replaceAll(' ', '_');
+      final name = label.toLowerCase().replaceAll(' ', '_').replaceAll(RegExp(r'[^a-z0-9_]'), '');
       
+      // Process options for select/multiselect fields
       List<String>? options;
       if (_selectedType == CustomFieldType.select || 
           _selectedType == CustomFieldType.multiSelect) {
@@ -114,14 +120,19 @@ class _CustomFieldEditorDialogState extends State<CustomFieldEditorDialog> {
             .where((e) => e.isNotEmpty)
             .toList();
             
+        // This should be caught by validator, but double-check
         if (options.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Bitte mindestens eine Option angeben')),
+            const SnackBar(
+              content: Text('Bitte mindestens eine Option angeben'),
+              backgroundColor: Colors.red,
+            ),
           );
           return;
         }
       }
       
+      // Create the custom field
       final field = CustomField(
         id: widget.field?.id ?? const Uuid().v4(),
         name: widget.field?.name ?? 'custom_$name',
@@ -134,8 +145,17 @@ class _CustomFieldEditorDialogState extends State<CustomFieldEditorDialog> {
         options: options,
       );
       
+      // Save and close
       widget.onSave(field);
       Navigator.pop(context);
+    } catch (e) {
+      // Show error if something goes wrong
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Fehler beim Speichern: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
   
@@ -264,7 +284,7 @@ class _CustomFieldEditorDialogState extends State<CustomFieldEditorDialog> {
                       if (_selectedType == CustomFieldType.select || 
                           _selectedType == CustomFieldType.multiSelect) ...[
                         Text(
-                          'Optionen (eine pro Zeile)',
+                          'Optionen (eine pro Zeile) *',
                           style: theme.textTheme.titleSmall,
                         ),
                         const SizedBox(height: 8),
@@ -273,14 +293,26 @@ class _CustomFieldEditorDialogState extends State<CustomFieldEditorDialog> {
                           decoration: const InputDecoration(
                             hintText: 'Option 1\nOption 2\nOption 3',
                             border: OutlineInputBorder(),
+                            helperText: 'Geben Sie jede Option in einer neuen Zeile ein',
                           ),
                           maxLines: 5,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Bitte mindestens eine Option angeben';
-                            }
-                            return null;
-                          },
+                          validator: (_selectedType == CustomFieldType.select || 
+                                      _selectedType == CustomFieldType.multiSelect)
+                              ? (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Bitte mindestens eine Option angeben';
+                                  }
+                                  final options = value
+                                      .split('\n')
+                                      .map((e) => e.trim())
+                                      .where((e) => e.isNotEmpty)
+                                      .toList();
+                                  if (options.isEmpty) {
+                                    return 'Bitte mindestens eine Option angeben';
+                                  }
+                                  return null;
+                                }
+                              : null,
                         ),
                         const SizedBox(height: 16),
                       ],

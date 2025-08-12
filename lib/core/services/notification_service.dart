@@ -145,6 +145,7 @@ class NotificationService {
     final colors = _getNotificationColors(notification.type);
     
     // Create snackbar with consistent styling
+    // Positioned under the app bar at the top
     final snackBar = SnackBar(
       content: Row(
         children: [
@@ -168,7 +169,8 @@ class NotificationService {
       backgroundColor: colors.backgroundColor,
       duration: notification.duration,
       behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      // Position at top, under the app bar (typically 56px + status bar)
+      margin: const EdgeInsets.fromLTRB(16, 80, 16, 0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
