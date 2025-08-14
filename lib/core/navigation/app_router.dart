@@ -16,6 +16,9 @@ import '../../features/profile/presentation/pages/profile_view_page.dart';
 import '../../features/profile/presentation/pages/profile_edit_page.dart';
 import '../../features/profile/domain/entities/user_profile.dart';
 import '../../features/map/presentation/pages/map_page.dart';
+import '../../features/chat/presentation/pages/conversations_list_page.dart';
+import '../../features/chat/presentation/pages/chat_page.dart';
+import '../../features/chat/domain/entities/conversation.dart';
 
 /// Provider for the app router
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -35,6 +38,8 @@ class AppRouter {
   static const String profileView = '/profile';
   static const String profileEdit = '/profile/edit';
   static const String mapView = '/map';
+  static const String conversationsList = '/chats';
+  static const String chatPage = '/chats/:id';
   
   /// Main router configuration
   static final GoRouter router = GoRouter(
@@ -132,6 +137,24 @@ class AppRouter {
         path: mapView,
         name: 'mapView',
         builder: (context, state) => const MapPage(),
+      ),
+      
+      // Conversations list
+      GoRoute(
+        path: conversationsList,
+        name: 'conversationsList',
+        builder: (context, state) => const ConversationsListPage(),
+        routes: [
+          // Individual chat
+          GoRoute(
+            path: ':id',
+            name: 'chatPage',
+            builder: (context, state) {
+              final conversation = state.extra as Conversation;
+              return ChatPage(conversation: conversation);
+            },
+          ),
+        ],
       ),
     ],
     

@@ -15,6 +15,8 @@ import '../../domain/entities/friend_template.dart';
 import '../providers/friends_provider.dart';
 import '../../../friendbook/presentation/providers/friend_books_provider.dart';
 import '../../../template/presentation/providers/template_provider.dart';
+import '../../../chat/presentation/providers/chat_provider.dart';
+import '../../../chat/presentation/pages/chat_page.dart';
 
 /// Page displaying friend details
 class FriendDetailPage extends ConsumerStatefulWidget {
@@ -242,6 +244,27 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
       appBar: AppBar(
         title: Text(_friend!.name),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline),
+            onPressed: () async {
+              // Create or get conversation with this friend
+              final conversation = await ref.read(chatProvider.notifier).createOrGetConversation(
+                friendId: _friend!.id,
+                friendName: _friend!.name,
+                friendPhotoPath: _friend!.photoPath,
+              );
+              
+              // Navigate to chat page
+              if (mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(conversation: conversation),
+                  ),
+                );
+              }
+            },
+          ),
           IconButton(
             icon: Icon(
               _friend!.isFavorite ? Icons.favorite : Icons.favorite_border,

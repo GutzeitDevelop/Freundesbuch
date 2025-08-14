@@ -7,6 +7,8 @@ import '../../features/friend/data/models/friend_model.dart';
 import '../../features/friendbook/data/models/friend_book_model.dart';
 import '../../features/template/data/models/template_model.dart';
 import '../../features/profile/data/models/user_profile_model.dart';
+import '../../features/chat/data/models/message_model.dart';
+import '../../features/chat/data/models/conversation_model.dart';
 
 /// Service for managing database initialization
 class DatabaseService {
@@ -46,8 +48,21 @@ class DatabaseService {
     }
     
     // Register UserProfileModel adapter if not already registered
-    if (!Hive.isAdapterRegistered(10)) {
+    if (!Hive.isAdapterRegistered(3)) {
       Hive.registerAdapter(UserProfileModelAdapter());
+    }
+    
+    // Register Chat models
+    if (!Hive.isAdapterRegistered(10)) {
+      Hive.registerAdapter(MessageModelAdapter());
+    }
+    
+    if (!Hive.isAdapterRegistered(11)) {
+      Hive.registerAdapter(ChatParticipantModelAdapter());
+    }
+    
+    if (!Hive.isAdapterRegistered(12)) {
+      Hive.registerAdapter(ConversationModelAdapter());
     }
   }
   

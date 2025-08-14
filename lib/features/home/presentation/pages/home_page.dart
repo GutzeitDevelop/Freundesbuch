@@ -140,6 +140,18 @@ class _HomePageState extends ConsumerState<HomePage> {
               style: ActionButtonStyle.secondary,
               size: ActionButtonSize.large,
             ),
+            const SizedBox(height: 16),
+            
+            ConsistentActionButton(
+              label: 'Chats',
+              icon: Icons.chat_bubble_outline,
+              onPressed: () {
+                // Navigate to chats list
+                navigationService.navigateTo(context, AppRouter.conversationsList);
+              },
+              style: ActionButtonStyle.secondary,
+              size: ActionButtonSize.large,
+            ),
             const SizedBox(height: 32),
             
             // Profile button

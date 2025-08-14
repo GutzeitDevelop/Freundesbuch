@@ -16,11 +16,13 @@ class AppColors {
   static const Color primaryBlue = Color(0xFF2196F3);  // Main brand color
   static const Color primaryBlueDark = Color(0xFF1976D2);  // Darker variant
   static const Color primaryBlueLight = Color(0xFF64B5F6);  // Lighter variant
+  static const Color primary = primaryBlue;  // Alias for primary color
   
   // Secondary Colors - Accent and complementary
   static const Color secondaryOrange = Color(0xFFFF9800);  // Warm accent
   static const Color secondaryOrangeDark = Color(0xFFF57C00);
   static const Color secondaryOrangeLight = Color(0xFFFFB74D);
+  static const Color secondary = secondaryOrange;  // Alias for secondary color
   
   // Semantic Colors
   static const Color success = Color(0xFF4CAF50);  // Green for success
@@ -38,6 +40,7 @@ class AppColors {
   static const Color backgroundLight = Color(0xFFFAFAFA);  // Off-white
   static const Color backgroundWhite = Color(0xFFFFFFFF);  // Pure white
   static const Color backgroundGrey = Color(0xFFF5F5F5);  // Light grey
+  static const Color surface = backgroundGrey;  // Alias for surface color
   
   // Dark Mode Colors
   static const Color backgroundDark = Color(0xFF121212);  // Dark background
