@@ -14,6 +14,10 @@ import '../../features/template/presentation/pages/template_management_page.dart
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/profile/presentation/pages/profile_view_page.dart';
 import '../../features/profile/presentation/pages/profile_edit_page.dart';
+import '../../features/profile/presentation/pages/profile_share_page.dart';
+import '../../features/profile/presentation/pages/profile_share_page_simple.dart';
+import '../../features/profile/presentation/pages/profile_share_fixed.dart';
+import '../../features/profile/presentation/pages/profile_scan_page.dart';
 import '../../features/profile/domain/entities/user_profile.dart';
 import '../../features/map/presentation/pages/map_page.dart';
 import '../../features/chat/presentation/pages/conversations_list_page.dart';
@@ -37,6 +41,8 @@ class AppRouter {
   static const String templateManagement = '/templates';
   static const String profileView = '/profile';
   static const String profileEdit = '/profile/edit';
+  static const String profileShare = '/profile/share';
+  static const String profileScan = '/profile/scan';
   static const String mapView = '/map';
   static const String conversationsList = '/chats';
   static const String chatPage = '/chats/:id';
@@ -128,6 +134,16 @@ class AppRouter {
               final profile = state.extra;
               return ProfileEditPage(existingProfile: profile as UserProfile?);
             },
+          ),
+          GoRoute(
+            path: 'share',
+            name: 'profileShare',
+            builder: (context, state) => const ProfileShareFixed(),
+          ),
+          GoRoute(
+            path: 'scan',
+            name: 'profileScan',
+            builder: (context, state) => const ProfileScanPage(),
           ),
         ],
       ),

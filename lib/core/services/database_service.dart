@@ -7,8 +7,8 @@ import '../../features/friend/data/models/friend_model.dart';
 import '../../features/friendbook/data/models/friend_book_model.dart';
 import '../../features/template/data/models/template_model.dart';
 import '../../features/profile/data/models/user_profile_model.dart';
-import '../../features/chat/data/models/message_model.dart';
-import '../../features/chat/data/models/conversation_model.dart';
+// import '../../features/chat/data/models/message_model.dart';
+// import '../../features/chat/data/models/conversation_model.dart';
 
 /// Service for managing database initialization
 class DatabaseService {

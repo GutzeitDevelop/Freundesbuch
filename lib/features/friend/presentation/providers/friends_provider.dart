@@ -90,6 +90,16 @@ class FriendsNotifier extends StateNotifier<AsyncValue<List<Friend>>> {
     }
   }
   
+  /// Adds a new friend
+  Future<void> addFriend(Friend friend) async {
+    try {
+      await _repository.saveFriend(friend);
+      await loadFriends(); // Reload list
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+  
   /// Gets favorite friends
   Future<void> loadFavoriteFriends() async {
     state = const AsyncValue.loading();

@@ -11,6 +11,7 @@ import '../../../../core/navigation/app_router.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/widgets/standard_app_bar.dart';
 import '../../../../core/widgets/consistent_action_button.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Home page widget with back button handling
 class HomePage extends ConsumerStatefulWidget {
@@ -154,16 +155,46 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             const SizedBox(height: 32),
             
-            // Profile button
-            ConsistentActionButton(
-              label: 'Mein Profil',
-              icon: Icons.account_circle,
-              onPressed: () {
-                // Navigate to profile page
-                navigationService.navigateTo(context, AppRouter.profileView);
-              },
-              style: ActionButtonStyle.text,
-              size: ActionButtonSize.medium,
+            // Profile section
+            Row(
+              children: [
+                // Profile button
+                Expanded(
+                  child: ConsistentActionButton(
+                    label: 'Mein Profil',
+                    icon: Icons.account_circle,
+                    onPressed: () {
+                      navigationService.navigateTo(context, AppRouter.profileView);
+                    },
+                    style: ActionButtonStyle.text,
+                    size: ActionButtonSize.medium,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Share profile button
+                IconButton(
+                  onPressed: () {
+                    navigationService.navigateTo(context, AppRouter.profileShare);
+                  },
+                  icon: const Icon(Icons.qr_code),
+                  tooltip: 'Profil teilen',
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Scan profile button
+                IconButton(
+                  onPressed: () {
+                    navigationService.navigateTo(context, AppRouter.profileScan);
+                  },
+                  icon: const Icon(Icons.qr_code_scanner),
+                  tooltip: 'QR-Code scannen',
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.secondary.withOpacity(0.1),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
