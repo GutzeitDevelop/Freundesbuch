@@ -12,6 +12,7 @@ import '../../domain/entities/conversation.dart';
 import '../../domain/entities/message.dart';
 import '../providers/chat_provider.dart';
 import 'chat_page.dart';
+import '../../../friend/presentation/pages/friends_list_page.dart';
 
 /// Page displaying all conversations
 class ConversationsListPage extends ConsumerStatefulWidget {
@@ -110,6 +111,65 @@ class _ConversationsListPageState extends ConsumerState<ConversationsListPage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showNewChatOptions,
+        tooltip: 'Neuer Chat',
+        child: const Icon(Icons.chat_bubble_outline),
+      ),
+    );
+  }
+  
+  void _showNewChatOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Chat mit Freund'),
+            onTap: () {
+              Navigator.pop(context);
+              // Navigate to friends list to select a friend
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FriendsListPage(selectMode: true),
+                ),
+              ).then((friend) async {
+                if (friend != null) {
+                  // Create or get conversation with selected friend
+                  final conversation = await ref.read(chatProvider.notifier).createOrGetConversation(
+                    friendId: friend.id,
+                    friendName: friend.name,
+                    friendPhotoPath: friend.photoPath,
+                  );
+                  
+                  if (mounted) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatPage(conversation: conversation),
+                      ),
+                    );
+                  }
+                }
+              });
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.group),
+            title: const Text('Gruppen-Chat (Freundesbuch)'),
+            onTap: () {
+              Navigator.pop(context);
+              // TODO: Implement friendbook group chat selection
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Gruppen-Chats kommen bald!')),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

@@ -16,7 +16,12 @@ import '../widgets/friend_list_tile.dart';
 
 /// Page displaying list of friends
 class FriendsListPage extends ConsumerStatefulWidget {
-  const FriendsListPage({super.key});
+  final bool selectMode;
+  
+  const FriendsListPage({
+    super.key,
+    this.selectMode = false,
+  });
 
   @override
   ConsumerState<FriendsListPage> createState() => _FriendsListPageState();
@@ -62,7 +67,7 @@ class _FriendsListPageState extends ConsumerState<FriendsListPage> {
       },
       child: Scaffold(
         appBar: StandardAppBar(
-          title: l10n.myFriends,
+          title: widget.selectMode ? 'Freund auswählen' : l10n.myFriends,
           actions: [
           IconButton(
             icon: Icon(
@@ -139,8 +144,15 @@ class _FriendsListPageState extends ConsumerState<FriendsListPage> {
                     final friend = friends[index];
                     return FriendListTile(
                       friend: friend,
-                      onTap: () => navigationService.navigateTo(context, '/friends/${friend.id}'),
-                      onFavoriteToggle: () {
+                      onTap: () {
+                        if (widget.selectMode) {
+                          // Return selected friend to caller
+                          Navigator.pop(context, friend);
+                        } else {
+                          navigationService.navigateTo(context, '/friends/${friend.id}');
+                        }
+                      },
+                      onFavoriteToggle: widget.selectMode ? null : () {
                         ref.read(friendsProvider.notifier).toggleFavorite(friend.id);
                       },
                     );
@@ -178,7 +190,7 @@ class _FriendsListPageState extends ConsumerState<FriendsListPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: widget.selectMode ? null : FloatingActionButton(
         onPressed: () => navigationService.navigateTo(context, AppRouter.addFriend),
         tooltip: l10n.addFriend,
         child: const Icon(Icons.person_add),

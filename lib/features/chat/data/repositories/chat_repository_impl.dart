@@ -13,14 +13,16 @@ import '../../domain/repositories/chat_repository.dart';
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
 
-/// Implementation of chat repository using Hive for local storage
+/// Implementation of chat repository using in-memory storage
 class ChatRepositoryImpl implements ChatRepository {
   static const String _conversationsBoxName = 'conversations';
   static const String _messagesBoxName = 'messages';
   static const String _currentUserId = 'current_user'; // Mock current user ID
   
-  late Box<ConversationModel> _conversationsBox;
-  late Box<MessageModel> _messagesBox;
+  // Temporary in-memory storage until Hive adapters are generated
+  final Map<String, ConversationModel> _conversationsMap = {};
+  final Map<String, MessageModel> _messagesMap = {};
+  
   final _uuid = const Uuid();
   final _random = Random();
   
@@ -32,9 +34,7 @@ class ChatRepositoryImpl implements ChatRepository {
   
   /// Initialize the repository
   Future<void> init() async {
-    _conversationsBox = await Hive.openBox<ConversationModel>(_conversationsBoxName);
-    _messagesBox = await Hive.openBox<MessageModel>(_messagesBoxName);
-    
+    // No Hive initialization needed for now
     // Start watching for changes
     _watchConversationsInternal();
     _watchUnreadCountInternal();
@@ -44,7 +44,7 @@ class ChatRepositoryImpl implements ChatRepository {
   
   @override
   Future<List<Conversation>> getAllConversations() async {
-    final models = _conversationsBox.values.toList();
+    final models = _conversationsMap.values.toList();
     
     // Sort by last message timestamp or creation date
     models.sort((a, b) {
@@ -65,14 +65,14 @@ class ChatRepositoryImpl implements ChatRepository {
   
   @override
   Future<Conversation?> getConversationById(String conversationId) async {
-    final model = _conversationsBox.get(conversationId);
+    final model = _conversationsMap[conversationId];
     return model?.toEntity();
   }
   
   @override
   Future<Conversation?> getConversationByFriendId(String friendId) async {
     try {
-      final model = _conversationsBox.values.firstWhere(
+      final model = _conversationsMap.values.firstWhere(
         (c) => c.friendId == friendId,
       );
       return model.toEntity();
@@ -84,7 +84,7 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Future<Conversation?> getConversationByFriendBookId(String friendBookId) async {
     try {
-      final model = _conversationsBox.values.firstWhere(
+      final model = _conversationsMap.values.firstWhere(
         (c) => c.friendBookId == friendBookId,
       );
       return model.toEntity();

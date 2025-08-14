@@ -52,18 +52,19 @@ class DatabaseService {
       Hive.registerAdapter(UserProfileModelAdapter());
     }
     
-    // Register Chat models
-    if (!Hive.isAdapterRegistered(10)) {
-      Hive.registerAdapter(MessageModelAdapter());
-    }
-    
-    if (!Hive.isAdapterRegistered(11)) {
-      Hive.registerAdapter(ChatParticipantModelAdapter());
-    }
-    
-    if (!Hive.isAdapterRegistered(12)) {
-      Hive.registerAdapter(ConversationModelAdapter());
-    }
+    // Note: Chat model adapters need to be generated with build_runner
+    // Temporarily disable until adapters are generated
+    // if (!Hive.isAdapterRegistered(10)) {
+    //   Hive.registerAdapter(MessageModelAdapter());
+    // }
+    // 
+    // if (!Hive.isAdapterRegistered(11)) {
+    //   Hive.registerAdapter(ChatParticipantModelAdapter());
+    // }
+    // 
+    // if (!Hive.isAdapterRegistered(12)) {
+    //   Hive.registerAdapter(ConversationModelAdapter());
+    // }
   }
   
   /// Opens all required Hive boxes

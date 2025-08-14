@@ -8,11 +8,11 @@ import 'package:uuid/uuid.dart';
 import '../../domain/entities/conversation.dart';
 import '../../domain/entities/message.dart';
 import '../../domain/repositories/chat_repository.dart';
-import '../../data/repositories/chat_repository_impl.dart';
+import '../../data/repositories/simple_chat_repository.dart';
 
 /// Provider for chat repository
 final chatRepositoryProvider = Provider<ChatRepository>((ref) {
-  final repository = ChatRepositoryImpl();
+  final repository = SimpleChatRepository();
   repository.init();
   return repository;
 });
