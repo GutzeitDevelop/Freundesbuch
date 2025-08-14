@@ -23,6 +23,7 @@ import '../../features/map/presentation/pages/map_page.dart';
 import '../../features/chat/presentation/pages/conversations_list_page.dart';
 import '../../features/chat/presentation/pages/chat_page.dart';
 import '../../features/chat/domain/entities/conversation.dart';
+import '../../features/settings/presentation/pages/settings_page.dart';
 
 /// Provider for the app router
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -46,6 +47,7 @@ class AppRouter {
   static const String mapView = '/map';
   static const String conversationsList = '/chats';
   static const String chatPage = '/chats/:id';
+  static const String settings = '/settings';
   
   /// Main router configuration
   static final GoRouter router = GoRouter(
@@ -171,6 +173,13 @@ class AppRouter {
             },
           ),
         ],
+      ),
+      
+      // Settings page
+      GoRoute(
+        path: settings,
+        name: 'settings',
+        builder: (context, state) => const SettingsPage(),
       ),
     ],
     

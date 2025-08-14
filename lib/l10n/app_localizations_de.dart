@@ -231,4 +231,161 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get removePhoto => 'Foto entfernen';
+
+  @override
+  String get profile => 'Profil';
+
+  @override
+  String get myProfile => 'Mein Profil';
+
+  @override
+  String get shareProfile => 'Profil teilen';
+
+  @override
+  String get scanProfile => 'QR-Code scannen';
+
+  @override
+  String get createProfile => 'Profil erstellen';
+
+  @override
+  String get noProfileYet => 'Kein Profil vorhanden';
+
+  @override
+  String get chats => 'Chats';
+
+  @override
+  String get map => 'Karte';
+
+  @override
+  String get friendsMap => 'Freunde Karte';
+
+  @override
+  String get templates => 'Vorlagen';
+
+  @override
+  String get manageTemplates => 'Vorlagen verwalten';
+
+  @override
+  String get share => 'Teilen';
+
+  @override
+  String get copy => 'Kopieren';
+
+  @override
+  String get copied => 'Kopiert!';
+
+  @override
+  String get qrCode => 'QR-Code';
+
+  @override
+  String get loading => 'Lädt...';
+
+  @override
+  String get error => 'Fehler';
+
+  @override
+  String get success => 'Erfolg';
+
+  @override
+  String get german => 'Deutsch';
+
+  @override
+  String get english => 'Englisch';
+
+  @override
+  String get systemDefault => 'Systemstandard';
+
+  @override
+  String get lightTheme => 'Hell';
+
+  @override
+  String get darkTheme => 'Dunkel';
+
+  @override
+  String get systemTheme => 'System';
+
+  @override
+  String get back => 'Zurück';
+
+  @override
+  String get other => 'Andere';
+
+  @override
+  String get addedAs => 'Als Freund hinzugefügt';
+
+  @override
+  String get linkCopied => 'Link kopiert!';
+
+  @override
+  String get comingSoonFeature => 'Kommt bald!';
+
+  @override
+  String get scanInstructions => 'Richte die Kamera auf den QR-Code';
+
+  @override
+  String get scanAutomatic => 'Der Code wird automatisch erkannt';
+
+  @override
+  String get profileRecognized => 'Profil erkannt!';
+
+  @override
+  String get aboutMe => 'Über mich';
+
+  @override
+  String get addAsFriend => 'Als Freund hinzufügen';
+
+  @override
+  String get invalidQrCode => 'Ungültiger QR-Code';
+
+  @override
+  String get errorAddingFriend => 'Fehler beim Hinzufügen';
+
+  @override
+  String get friendAdded => 'Freund hinzugefügt!';
+
+  @override
+  String get viaQrCode => 'Via QR-Code';
+
+  @override
+  String get letFriendScan => 'Lass deinen neuen Freund diesen QR-Code scannen';
+
+  @override
+  String get nfc => 'NFC';
+
+  @override
+  String get bluetooth => 'Bluetooth';
+
+  @override
+  String get holdPhoneNear => 'Halte dein Handy an ein anderes';
+
+  @override
+  String get shareViaBluetooth => 'Teile über Bluetooth';
+
+  @override
+  String get shareViaOther => 'Teilen über...';
+
+  @override
+  String get whatsappTelegram => 'WhatsApp, Telegram, etc.';
+
+  @override
+  String get sendAsEmail => 'Als E-Mail versenden';
+
+  @override
+  String get sms => 'SMS';
+
+  @override
+  String get sendAsSms => 'Als SMS versenden';
+
+  @override
+  String get link => 'Link';
+
+  @override
+  String get linkToProfile => 'Link zum Profil kopieren';
+
+  @override
+  String get soon => 'Bald';
+
+  @override
+  String get createProfileFirst =>
+      'Erstelle zuerst ein Profil, um es teilen zu können';
 }

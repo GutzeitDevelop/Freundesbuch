@@ -7,10 +7,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/database_service.dart';
 import 'core/navigation/app_router.dart';
 import 'core/providers/core_providers.dart';
+import 'core/providers/locale_provider.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -20,10 +22,16 @@ void main() async {
   // Initialize database
   await DatabaseService.initialize();
   
+  // Initialize shared preferences
+  final prefs = await SharedPreferences.getInstance();
+  
   // Run the app with Riverpod provider scope
   runApp(
-    const ProviderScope(
-      child: MyFriendsApp(),
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const MyFriendsApp(),
     ),
   );
 }
@@ -50,6 +58,7 @@ class _MyFriendsAppState extends ConsumerState<MyFriendsApp> {
   Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
     final scaffoldMessengerKey = ref.watch(scaffoldMessengerKeyProvider);
+    final locale = ref.watch(localeProvider); // Watch locale changes
     
     return MaterialApp.router(
       title: 'MyFriends',
@@ -74,7 +83,7 @@ class _MyFriendsAppState extends ConsumerState<MyFriendsApp> {
         Locale('de'), // German - Primary
         Locale('en'), // English
       ],
-      locale: const Locale('de'), // Default to German
+      locale: locale, // Use dynamic locale from provider
       
       // Router configuration
       routerConfig: router,

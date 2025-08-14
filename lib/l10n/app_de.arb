@@ -364,5 +364,265 @@
   "@removePhoto": {
     "description": "Remove photo option"
   },
-  "removePhoto": "Foto entfernen"
+  "removePhoto": "Foto entfernen",
+  
+  "@profile": {
+    "description": "Profile"
+  },
+  "profile": "Profil",
+  
+  "@myProfile": {
+    "description": "My profile"
+  },
+  "myProfile": "Mein Profil",
+  
+  "@shareProfile": {
+    "description": "Share profile"
+  },
+  "shareProfile": "Profil teilen",
+  
+  "@scanProfile": {
+    "description": "Scan QR code"
+  },
+  "scanProfile": "QR-Code scannen",
+  
+  "@createProfile": {
+    "description": "Create profile"
+  },
+  "createProfile": "Profil erstellen",
+  
+  "@noProfileYet": {
+    "description": "No profile yet"
+  },
+  "noProfileYet": "Kein Profil vorhanden",
+  
+  "@chats": {
+    "description": "Chats"
+  },
+  "chats": "Chats",
+  
+  "@map": {
+    "description": "Map"
+  },
+  "map": "Karte",
+  
+  "@friendsMap": {
+    "description": "Friends map"
+  },
+  "friendsMap": "Freunde Karte",
+  
+  "@templates": {
+    "description": "Templates"
+  },
+  "templates": "Vorlagen",
+  
+  "@manageTemplates": {
+    "description": "Manage templates"
+  },
+  "manageTemplates": "Vorlagen verwalten",
+  
+  "@share": {
+    "description": "Share"
+  },
+  "share": "Teilen",
+  
+  "@copy": {
+    "description": "Copy"
+  },
+  "copy": "Kopieren",
+  
+  "@copied": {
+    "description": "Copied!"
+  },
+  "copied": "Kopiert!",
+  
+  "@qrCode": {
+    "description": "QR Code"
+  },
+  "qrCode": "QR-Code",
+  
+  "@loading": {
+    "description": "Loading"
+  },
+  "loading": "Lädt...",
+  
+  "@error": {
+    "description": "Error"
+  },
+  "error": "Fehler",
+  
+  "@success": {
+    "description": "Success"
+  },
+  "success": "Erfolg",
+  
+  "@german": {
+    "description": "German language"
+  },
+  "german": "Deutsch",
+  
+  "@english": {
+    "description": "English language"
+  },
+  "english": "Englisch",
+  
+  "@systemDefault": {
+    "description": "System default"
+  },
+  "systemDefault": "Systemstandard",
+  
+  "@lightTheme": {
+    "description": "Light theme"
+  },
+  "lightTheme": "Hell",
+  
+  "@darkTheme": {
+    "description": "Dark theme"
+  },
+  "darkTheme": "Dunkel",
+  
+  "@systemTheme": {
+    "description": "System theme"
+  },
+  "systemTheme": "System",
+  
+  "@back": {
+    "description": "Back"
+  },
+  "back": "Zurück",
+  
+  "@other": {
+    "description": "Other"
+  },
+  "other": "Andere",
+  
+  "@addedAs": {
+    "description": "Added as friend"
+  },
+  "addedAs": "Als Freund hinzugefügt",
+  
+  "@linkCopied": {
+    "description": "Link copied"
+  },
+  "linkCopied": "Link kopiert!",
+  
+  "@comingSoonFeature": {
+    "description": "Coming soon feature"
+  },
+  "comingSoonFeature": "Kommt bald!",
+  
+  "@scanInstructions": {
+    "description": "Scan instructions"
+  },
+  "scanInstructions": "Richte die Kamera auf den QR-Code",
+  
+  "@scanAutomatic": {
+    "description": "Scan automatic"
+  },
+  "scanAutomatic": "Der Code wird automatisch erkannt",
+  
+  "@profileRecognized": {
+    "description": "Profile recognized"
+  },
+  "profileRecognized": "Profil erkannt!",
+  
+  "@aboutMe": {
+    "description": "About me"
+  },
+  "aboutMe": "Über mich",
+  
+  "@addAsFriend": {
+    "description": "Add as friend"
+  },
+  "addAsFriend": "Als Freund hinzufügen",
+  
+  "@invalidQrCode": {
+    "description": "Invalid QR code"
+  },
+  "invalidQrCode": "Ungültiger QR-Code",
+  
+  "@errorAddingFriend": {
+    "description": "Error adding friend"
+  },
+  "errorAddingFriend": "Fehler beim Hinzufügen",
+  
+  "@friendAdded": {
+    "description": "Friend added"
+  },
+  "friendAdded": "Freund hinzugefügt!",
+  
+  "@viaQrCode": {
+    "description": "Via QR code"
+  },
+  "viaQrCode": "Via QR-Code",
+  
+  "@letFriendScan": {
+    "description": "Let friend scan"
+  },
+  "letFriendScan": "Lass deinen neuen Freund diesen QR-Code scannen",
+  
+  "@nfc": {
+    "description": "NFC"
+  },
+  "nfc": "NFC",
+  
+  "@bluetooth": {
+    "description": "Bluetooth"
+  },
+  "bluetooth": "Bluetooth",
+  
+  "@holdPhoneNear": {
+    "description": "Hold phone near"
+  },
+  "holdPhoneNear": "Halte dein Handy an ein anderes",
+  
+  "@shareViaBluetooth": {
+    "description": "Share via Bluetooth"
+  },
+  "shareViaBluetooth": "Teile über Bluetooth",
+  
+  "@shareViaOther": {
+    "description": "Share via other"
+  },
+  "shareViaOther": "Teilen über...",
+  
+  "@whatsappTelegram": {
+    "description": "WhatsApp, Telegram, etc"
+  },
+  "whatsappTelegram": "WhatsApp, Telegram, etc.",
+  
+  "@sendAsEmail": {
+    "description": "Send as email"
+  },
+  "sendAsEmail": "Als E-Mail versenden",
+  
+  "@sms": {
+    "description": "SMS"
+  },
+  "sms": "SMS",
+  
+  "@sendAsSms": {
+    "description": "Send as SMS"
+  },
+  "sendAsSms": "Als SMS versenden",
+  
+  "@link": {
+    "description": "Link"
+  },
+  "link": "Link",
+  
+  "@linkToProfile": {
+    "description": "Link to profile"
+  },
+  "linkToProfile": "Link zum Profil kopieren",
+  
+  "@soon": {
+    "description": "Soon"
+  },
+  "soon": "Bald",
+  
+  "@createProfileFirst": {
+    "description": "Create profile first"
+  },
+  "createProfileFirst": "Erstelle zuerst ein Profil, um es teilen zu können"
 }

@@ -535,6 +535,318 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Foto entfernen'**
   String get removePhoto;
+
+  /// Profile
+  ///
+  /// In de, this message translates to:
+  /// **'Profil'**
+  String get profile;
+
+  /// My profile
+  ///
+  /// In de, this message translates to:
+  /// **'Mein Profil'**
+  String get myProfile;
+
+  /// Share profile
+  ///
+  /// In de, this message translates to:
+  /// **'Profil teilen'**
+  String get shareProfile;
+
+  /// Scan QR code
+  ///
+  /// In de, this message translates to:
+  /// **'QR-Code scannen'**
+  String get scanProfile;
+
+  /// Create profile
+  ///
+  /// In de, this message translates to:
+  /// **'Profil erstellen'**
+  String get createProfile;
+
+  /// No profile yet
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Profil vorhanden'**
+  String get noProfileYet;
+
+  /// Chats
+  ///
+  /// In de, this message translates to:
+  /// **'Chats'**
+  String get chats;
+
+  /// Map
+  ///
+  /// In de, this message translates to:
+  /// **'Karte'**
+  String get map;
+
+  /// Friends map
+  ///
+  /// In de, this message translates to:
+  /// **'Freunde Karte'**
+  String get friendsMap;
+
+  /// Templates
+  ///
+  /// In de, this message translates to:
+  /// **'Vorlagen'**
+  String get templates;
+
+  /// Manage templates
+  ///
+  /// In de, this message translates to:
+  /// **'Vorlagen verwalten'**
+  String get manageTemplates;
+
+  /// Share
+  ///
+  /// In de, this message translates to:
+  /// **'Teilen'**
+  String get share;
+
+  /// Copy
+  ///
+  /// In de, this message translates to:
+  /// **'Kopieren'**
+  String get copy;
+
+  /// Copied!
+  ///
+  /// In de, this message translates to:
+  /// **'Kopiert!'**
+  String get copied;
+
+  /// QR Code
+  ///
+  /// In de, this message translates to:
+  /// **'QR-Code'**
+  String get qrCode;
+
+  /// Loading
+  ///
+  /// In de, this message translates to:
+  /// **'Lädt...'**
+  String get loading;
+
+  /// Error
+  ///
+  /// In de, this message translates to:
+  /// **'Fehler'**
+  String get error;
+
+  /// Success
+  ///
+  /// In de, this message translates to:
+  /// **'Erfolg'**
+  String get success;
+
+  /// German language
+  ///
+  /// In de, this message translates to:
+  /// **'Deutsch'**
+  String get german;
+
+  /// English language
+  ///
+  /// In de, this message translates to:
+  /// **'Englisch'**
+  String get english;
+
+  /// System default
+  ///
+  /// In de, this message translates to:
+  /// **'Systemstandard'**
+  String get systemDefault;
+
+  /// Light theme
+  ///
+  /// In de, this message translates to:
+  /// **'Hell'**
+  String get lightTheme;
+
+  /// Dark theme
+  ///
+  /// In de, this message translates to:
+  /// **'Dunkel'**
+  String get darkTheme;
+
+  /// System theme
+  ///
+  /// In de, this message translates to:
+  /// **'System'**
+  String get systemTheme;
+
+  /// Back
+  ///
+  /// In de, this message translates to:
+  /// **'Zurück'**
+  String get back;
+
+  /// Other
+  ///
+  /// In de, this message translates to:
+  /// **'Andere'**
+  String get other;
+
+  /// Added as friend
+  ///
+  /// In de, this message translates to:
+  /// **'Als Freund hinzugefügt'**
+  String get addedAs;
+
+  /// Link copied
+  ///
+  /// In de, this message translates to:
+  /// **'Link kopiert!'**
+  String get linkCopied;
+
+  /// Coming soon feature
+  ///
+  /// In de, this message translates to:
+  /// **'Kommt bald!'**
+  String get comingSoonFeature;
+
+  /// Scan instructions
+  ///
+  /// In de, this message translates to:
+  /// **'Richte die Kamera auf den QR-Code'**
+  String get scanInstructions;
+
+  /// Scan automatic
+  ///
+  /// In de, this message translates to:
+  /// **'Der Code wird automatisch erkannt'**
+  String get scanAutomatic;
+
+  /// Profile recognized
+  ///
+  /// In de, this message translates to:
+  /// **'Profil erkannt!'**
+  String get profileRecognized;
+
+  /// About me
+  ///
+  /// In de, this message translates to:
+  /// **'Über mich'**
+  String get aboutMe;
+
+  /// Add as friend
+  ///
+  /// In de, this message translates to:
+  /// **'Als Freund hinzufügen'**
+  String get addAsFriend;
+
+  /// Invalid QR code
+  ///
+  /// In de, this message translates to:
+  /// **'Ungültiger QR-Code'**
+  String get invalidQrCode;
+
+  /// Error adding friend
+  ///
+  /// In de, this message translates to:
+  /// **'Fehler beim Hinzufügen'**
+  String get errorAddingFriend;
+
+  /// Friend added
+  ///
+  /// In de, this message translates to:
+  /// **'Freund hinzugefügt!'**
+  String get friendAdded;
+
+  /// Via QR code
+  ///
+  /// In de, this message translates to:
+  /// **'Via QR-Code'**
+  String get viaQrCode;
+
+  /// Let friend scan
+  ///
+  /// In de, this message translates to:
+  /// **'Lass deinen neuen Freund diesen QR-Code scannen'**
+  String get letFriendScan;
+
+  /// NFC
+  ///
+  /// In de, this message translates to:
+  /// **'NFC'**
+  String get nfc;
+
+  /// Bluetooth
+  ///
+  /// In de, this message translates to:
+  /// **'Bluetooth'**
+  String get bluetooth;
+
+  /// Hold phone near
+  ///
+  /// In de, this message translates to:
+  /// **'Halte dein Handy an ein anderes'**
+  String get holdPhoneNear;
+
+  /// Share via Bluetooth
+  ///
+  /// In de, this message translates to:
+  /// **'Teile über Bluetooth'**
+  String get shareViaBluetooth;
+
+  /// Share via other
+  ///
+  /// In de, this message translates to:
+  /// **'Teilen über...'**
+  String get shareViaOther;
+
+  /// WhatsApp, Telegram, etc
+  ///
+  /// In de, this message translates to:
+  /// **'WhatsApp, Telegram, etc.'**
+  String get whatsappTelegram;
+
+  /// Send as email
+  ///
+  /// In de, this message translates to:
+  /// **'Als E-Mail versenden'**
+  String get sendAsEmail;
+
+  /// SMS
+  ///
+  /// In de, this message translates to:
+  /// **'SMS'**
+  String get sms;
+
+  /// Send as SMS
+  ///
+  /// In de, this message translates to:
+  /// **'Als SMS versenden'**
+  String get sendAsSms;
+
+  /// Link
+  ///
+  /// In de, this message translates to:
+  /// **'Link'**
+  String get link;
+
+  /// Link to profile
+  ///
+  /// In de, this message translates to:
+  /// **'Link zum Profil kopieren'**
+  String get linkToProfile;
+
+  /// Soon
+  ///
+  /// In de, this message translates to:
+  /// **'Bald'**
+  String get soon;
+
+  /// Create profile first
+  ///
+  /// In de, this message translates to:
+  /// **'Erstelle zuerst ein Profil, um es teilen zu können'**
+  String get createProfileFirst;
 }
 
 class _AppLocalizationsDelegate

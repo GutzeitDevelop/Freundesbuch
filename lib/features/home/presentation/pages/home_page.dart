@@ -51,6 +51,15 @@ class _HomePageState extends ConsumerState<HomePage> {
         appBar: StandardAppBar(
           title: l10n.appTitle,
           showBackButton: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                navigationService.navigateTo(context, AppRouter.settings);
+              },
+              tooltip: l10n.settings,
+            ),
+          ],
         ),
         body: Center(
         child: Column(
