@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/widgets/standard_app_bar.dart';
@@ -72,9 +73,7 @@ class _FriendBooksListPageState extends ConsumerState<FriendBooksListPage> {
             onPressed: () {
               ref.read(friendBooksProvider.notifier).deleteFriendBook(friendBook.id);
               Navigator.pop(context);
-              ScaffoldMessenger.of(this.context).showSnackBar(
-                SnackBar(content: Text('Freundebuch gelöscht')),
-              );
+              SnackbarUtils.showSuccess(this.context, 'Freundebuch gelöscht');
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: Text(l10n.delete),

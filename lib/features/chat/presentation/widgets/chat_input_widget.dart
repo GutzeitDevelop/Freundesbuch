@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/entities/message.dart';
 
 /// Chat input widget for composing and sending messages
@@ -262,9 +263,7 @@ class _ChatInputWidgetState extends State<ChatInputWidget> {
   
   void _showEmojiPicker() {
     // TODO: Implement emoji picker
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Emoji-Auswahl kommt bald!')),
-    );
+    SnackbarUtils.showInfo(context, 'Emoji-Auswahl kommt bald!');
   }
   
   void _toggleVoiceRecording() {
@@ -274,14 +273,10 @@ class _ChatInputWidgetState extends State<ChatInputWidget> {
     
     if (_isRecording) {
       // TODO: Start recording
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sprachaufnahme startet...')),
-      );
+      SnackbarUtils.showInfo(context, 'Sprachaufnahme startet...');
     } else {
       // TODO: Stop recording and send
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sprachaufnahme beendet')),
-      );
+      SnackbarUtils.showInfo(context, 'Sprachaufnahme beendet');
     }
   }
   
@@ -290,14 +285,10 @@ class _ChatInputWidgetState extends State<ChatInputWidget> {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
         // TODO: Send image message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Bild ausgewählt: ${image.name}')),
-        );
+        SnackbarUtils.showSuccess(context, 'Bild ausgewählt: ${image.name}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fehler: $e')),
-      );
+      SnackbarUtils.showError(context, 'Fehler: $e');
     }
   }
   
@@ -308,22 +299,15 @@ class _ChatInputWidgetState extends State<ChatInputWidget> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Standortberechtigung verweigert'),
-            ),
-          );
+          SnackbarUtils.showError(context, 'Standortberechtigung verweigert');
           return;
         }
       }
       
       if (permission == LocationPermission.deniedForever) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Standortberechtigung dauerhaft verweigert. Bitte in den Einstellungen aktivieren.',
-            ),
-          ),
+        SnackbarUtils.showError(
+          context,
+          'Standortberechtigung dauerhaft verweigert. Bitte in den Einstellungen aktivieren.',
         );
         return;
       }
@@ -332,25 +316,18 @@ class _ChatInputWidgetState extends State<ChatInputWidget> {
       final position = await Geolocator.getCurrentPosition();
       
       // TODO: Send location message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Standort: ${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}',
-          ),
-        ),
+      SnackbarUtils.showSuccess(
+        context,
+        'Standort: ${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}',
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fehler beim Abrufen des Standorts: $e')),
-      );
+      SnackbarUtils.showError(context, 'Fehler beim Abrufen des Standorts: $e');
     }
   }
   
   void _shareContact() {
     // TODO: Implement contact sharing
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Kontakt-Teilen kommt bald!')),
-    );
+    SnackbarUtils.showInfo(context, 'Kontakt-Teilen kommt bald!');
   }
 }
 

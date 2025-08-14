@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../core/services/photo_service.dart';
 import '../../domain/entities/friend.dart';
@@ -111,9 +112,7 @@ class _FriendDetailPageState extends ConsumerState<FriendDetailPage> {
       }
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.friendDeleted)),
-        );
+        SnackbarUtils.showSuccess(context, l10n.friendDeleted);
         context.go(AppRouter.friendsList);
       }
     }

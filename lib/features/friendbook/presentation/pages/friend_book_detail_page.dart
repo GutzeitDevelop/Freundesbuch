@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/widgets/standard_app_bar.dart';
@@ -186,9 +187,7 @@ class _FriendBookDetailPageState extends ConsumerState<FriendBookDetailPage> {
                         onPressed: () async {
                           await _addFriendToBook(friend.id);
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(this.context).showSnackBar(
-                            SnackBar(content: Text('Freund hinzugefügt')),
-                          );
+                          SnackbarUtils.showSuccess(this.context, 'Freund hinzugefügt');
                         },
                       ),
                     );
@@ -369,9 +368,7 @@ class _FriendBookDetailPageState extends ConsumerState<FriendBookDetailPage> {
                         },
                         onDismissed: (direction) async {
                           await _removeFriendFromBook(friend.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Freund aus Buch entfernt')),
-                          );
+                          SnackbarUtils.showInfo(context, 'Freund aus Buch entfernt');
                         },
                         child: FriendListTile(
                           friend: friend,

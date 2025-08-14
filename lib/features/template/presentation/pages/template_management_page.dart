@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/widgets/standard_app_bar.dart';
@@ -27,9 +28,7 @@ class TemplateManagementPage extends ConsumerWidget {
   
   void _showEditDialog(BuildContext context, FriendTemplate template) {
     if (!template.isCustom) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vordefinierte Templates können nicht bearbeitet werden')),
-      );
+      SnackbarUtils.showError(context, 'Vordefinierte Templates können nicht bearbeitet werden');
       return;
     }
     
@@ -41,9 +40,7 @@ class TemplateManagementPage extends ConsumerWidget {
   
   void _confirmDelete(BuildContext context, WidgetRef ref, FriendTemplate template) {
     if (!template.isCustom) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vordefinierte Templates können nicht gelöscht werden')),
-      );
+      SnackbarUtils.showError(context, 'Vordefinierte Templates können nicht gelöscht werden');
       return;
     }
     
@@ -64,9 +61,7 @@ class TemplateManagementPage extends ConsumerWidget {
               Navigator.pop(dialogContext);
               await ref.read(templateProvider.notifier).deleteTemplate(template.id);
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Template gelöscht')),
-                );
+                SnackbarUtils.showSuccess(context, 'Template gelöscht');
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),

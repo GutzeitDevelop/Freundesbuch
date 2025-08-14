@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/entities/friend_book.dart';
 import '../providers/friend_books_provider.dart';
 
@@ -112,12 +113,8 @@ class _CreateFriendBookDialogState extends ConsumerState<CreateFriendBookDialog>
       Navigator.pop(context);
       
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isEditing ? 'Freundebuch aktualisiert' : 'Freundebuch erstellt'
-          ),
-        ),
+      SnackbarUtils.showSuccess(context, 
+        isEditing ? 'Freundebuch aktualisiert' : 'Freundebuch erstellt'
       );
     }
   }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/entities/conversation.dart';
 import '../../domain/entities/message.dart';
 import '../providers/chat_provider.dart';
@@ -532,9 +533,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   
   void _makeCall() {
     // TODO: Implement calling feature
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Anrufe kommen bald!')),
-    );
+    SnackbarUtils.showInfo(context, 'Anrufe kommen bald!');
   }
   
   void _showMoreOptions() {

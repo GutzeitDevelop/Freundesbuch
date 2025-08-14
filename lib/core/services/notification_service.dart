@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:collection';
+import '../utils/snackbar_utils.dart';
 
 /// Provider for the notification service
 final notificationServiceProvider = Provider<NotificationService>((ref) {
@@ -40,26 +41,24 @@ class NotificationMessage {
 /// Centralized notification service
 /// 
 /// Features:
-/// - Consistent positioning below app bar
+/// - Consistent positioning AT THE TOP below app bar
 /// - Different notification types (success, error, warning, info)
-/// - Queue management for multiple notifications
-/// - Action support for interactive notifications
+/// - Uses SnackbarUtils for TOP positioning
 class NotificationService {
-  /// Notification queue
-  final Queue<NotificationMessage> _notificationQueue = Queue<NotificationMessage>();
+  /// Current context for showing notifications
+  BuildContext? _currentContext;
   
-  /// Current scaffold messenger key
-  GlobalKey<ScaffoldMessengerState>? _messengerKey;
-  
-  /// Is currently showing a notification
-  bool _isShowingNotification = false;
-  
-  /// Set the scaffold messenger key
-  void setMessengerKey(GlobalKey<ScaffoldMessengerState> key) {
-    _messengerKey = key;
+  /// Set the current context
+  void setContext(BuildContext context) {
+    _currentContext = context;
   }
   
-  /// Show a notification
+  /// Set the scaffold messenger key (deprecated - kept for compatibility)
+  void setMessengerKey(GlobalKey<ScaffoldMessengerState> key) {
+    // No longer used - kept for compatibility
+  }
+  
+  /// Show a notification at the TOP
   void showNotification({
     required String message,
     NotificationType type = NotificationType.info,
@@ -67,199 +66,72 @@ class NotificationService {
     VoidCallback? action,
     String? actionLabel,
   }) {
-    final notification = NotificationMessage(
-      message: message,
-      type: type,
-      duration: duration,
-      action: action,
-      actionLabel: actionLabel,
-    );
+    // Get the current context from navigation
+    final context = _currentContext ?? WidgetsBinding.instance.rootElement;
+    if (context == null) return;
     
-    _notificationQueue.add(notification);
-    _processQueue();
-  }
-  
-  /// Show success notification
-  void showSuccess(String message, {Duration? duration}) {
-    showNotification(
-      message: message,
-      type: NotificationType.success,
-      duration: duration ?? const Duration(seconds: 3),
-    );
-  }
-  
-  /// Show error notification
-  void showError(String message, {Duration? duration}) {
-    showNotification(
-      message: message,
-      type: NotificationType.error,
-      duration: duration ?? const Duration(seconds: 4),
-    );
-  }
-  
-  /// Show warning notification
-  void showWarning(String message, {Duration? duration}) {
-    showNotification(
-      message: message,
-      type: NotificationType.warning,
-      duration: duration ?? const Duration(seconds: 3),
-    );
-  }
-  
-  /// Show info notification
-  void showInfo(String message, {Duration? duration}) {
-    showNotification(
-      message: message,
-      type: NotificationType.info,
-      duration: duration ?? const Duration(seconds: 3),
-    );
-  }
-  
-  /// Process the notification queue
-  void _processQueue() {
-    if (_isShowingNotification || _notificationQueue.isEmpty) {
-      return;
-    }
-    
-    _isShowingNotification = true;
-    final notification = _notificationQueue.removeFirst();
-    
-    _showSnackBar(notification);
-  }
-  
-  /// Show snackbar with consistent styling
-  void _showSnackBar(NotificationMessage notification) {
-    if (_messengerKey?.currentState == null) {
-      // Fallback: Try to find scaffold messenger in current context
-      _isShowingNotification = false;
-      _processQueue();
-      return;
-    }
-    
-    final messenger = _messengerKey!.currentState!;
-    
-    // Clear any existing snackbar
-    messenger.clearSnackBars();
-    
-    // Get color based on notification type
-    final colors = _getNotificationColors(notification.type);
-    
-    // Create snackbar with consistent styling
-    // Positioned under the app bar at the top
-    final snackBar = SnackBar(
-      content: Row(
-        children: [
-          Icon(
-            _getNotificationIcon(notification.type),
-            color: colors.iconColor,
-            size: 20,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              notification.message,
-              style: TextStyle(
-                color: colors.textColor,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: colors.backgroundColor,
-      duration: notification.duration,
-      behavior: SnackBarBehavior.floating,
-      // Position at top, under the app bar (typically 56px + status bar)
-      margin: const EdgeInsets.fromLTRB(16, 80, 16, 0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      action: notification.action != null && notification.actionLabel != null
-          ? SnackBarAction(
-              label: notification.actionLabel!,
-              textColor: colors.actionColor,
-              onPressed: notification.action!,
-            )
-          : null,
-      onVisible: () {
-        // Schedule next notification after this one is done
-        Future.delayed(notification.duration + const Duration(milliseconds: 300), () {
-          _isShowingNotification = false;
-          _processQueue();
-        });
-      },
-    );
-    
-    messenger.showSnackBar(snackBar);
-  }
-  
-  /// Get colors for notification type
-  _NotificationColors _getNotificationColors(NotificationType type) {
+    // Use SnackbarUtils to show at TOP
     switch (type) {
       case NotificationType.success:
-        return _NotificationColors(
-          backgroundColor: Colors.green.shade600,
-          textColor: Colors.white,
-          iconColor: Colors.white,
-          actionColor: Colors.white,
-        );
+        SnackbarUtils.showSuccess(context, message);
+        break;
       case NotificationType.error:
-        return _NotificationColors(
-          backgroundColor: Colors.red.shade600,
-          textColor: Colors.white,
-          iconColor: Colors.white,
-          actionColor: Colors.white,
-        );
+        SnackbarUtils.showError(context, message);
+        break;
       case NotificationType.warning:
-        return _NotificationColors(
+        SnackbarUtils.showTopSnackbar(
+          context, 
+          message,
           backgroundColor: Colors.orange.shade600,
-          textColor: Colors.white,
-          iconColor: Colors.white,
-          actionColor: Colors.white,
+          icon: Icons.warning_amber_outlined,
         );
+        break;
       case NotificationType.info:
-        return _NotificationColors(
-          backgroundColor: Colors.blueGrey.shade700,
-          textColor: Colors.white,
-          iconColor: Colors.white,
-          actionColor: Colors.white,
-        );
+        SnackbarUtils.showInfo(context, message);
+        break;
     }
   }
   
-  /// Get icon for notification type
-  IconData _getNotificationIcon(NotificationType type) {
-    switch (type) {
-      case NotificationType.success:
-        return Icons.check_circle_outline;
-      case NotificationType.error:
-        return Icons.error_outline;
-      case NotificationType.warning:
-        return Icons.warning_amber_outlined;
-      case NotificationType.info:
-        return Icons.info_outline;
+  /// Show success notification at TOP
+  void showSuccess(String message, {Duration? duration}) {
+    final context = _currentContext ?? WidgetsBinding.instance.rootElement;
+    if (context != null) {
+      SnackbarUtils.showSuccess(context, message);
     }
   }
   
-  /// Clear all notifications
+  /// Show error notification at TOP
+  void showError(String message, {Duration? duration}) {
+    final context = _currentContext ?? WidgetsBinding.instance.rootElement;
+    if (context != null) {
+      SnackbarUtils.showError(context, message);
+    }
+  }
+  
+  /// Show warning notification at TOP
+  void showWarning(String message, {Duration? duration}) {
+    final context = _currentContext ?? WidgetsBinding.instance.rootElement;
+    if (context != null) {
+      SnackbarUtils.showTopSnackbar(
+        context,
+        message,
+        backgroundColor: Colors.orange.shade600,
+        icon: Icons.warning_amber_outlined,
+        duration: duration ?? const Duration(seconds: 3),
+      );
+    }
+  }
+  
+  /// Show info notification at TOP
+  void showInfo(String message, {Duration? duration}) {
+    final context = _currentContext ?? WidgetsBinding.instance.rootElement;
+    if (context != null) {
+      SnackbarUtils.showInfo(context, message);
+    }
+  }
+  
+  /// Clear all notifications (no-op for now)
   void clearAll() {
-    _notificationQueue.clear();
-    _messengerKey?.currentState?.clearSnackBars();
-    _isShowingNotification = false;
+    // No-op for now since we use overlays
   }
-}
-
-/// Notification color scheme
-class _NotificationColors {
-  final Color backgroundColor;
-  final Color textColor;
-  final Color iconColor;
-  final Color actionColor;
-  
-  const _NotificationColors({
-    required this.backgroundColor,
-    required this.textColor,
-    required this.iconColor,
-    required this.actionColor,
-  });
 }

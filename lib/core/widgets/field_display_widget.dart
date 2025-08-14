@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import '../utils/snackbar_utils.dart';
 
 /// Widget for displaying a field with icon, label and value
 /// Used consistently across profile and friend detail pages
@@ -46,12 +47,7 @@ class FieldDisplayWidget extends StatelessWidget {
       onTap: copyable
           ? () {
               Clipboard.setData(ClipboardData(text: value!));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('$label kopiert'),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+              SnackbarUtils.showSuccess(context, '$label kopiert');
             }
           : onTap,
       trailing: copyable

@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../friend/domain/entities/friend_template.dart';
 import '../providers/template_provider.dart';
 import 'custom_field_editor.dart';
@@ -73,9 +74,7 @@ class _CreateTemplateDialogState extends ConsumerState<CreateTemplateDialog> {
   void _saveTemplate() async {
     if (_formKey.currentState!.validate()) {
       if (_visibleFields.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Wähle mindestens ein Feld aus')),
-        );
+        SnackbarUtils.showError(context, 'Wähle mindestens ein Feld aus');
         return;
       }
       
@@ -103,17 +102,11 @@ class _CreateTemplateDialogState extends ConsumerState<CreateTemplateDialog> {
         
         if (mounted) {
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(isEditing ? 'Template aktualisiert' : 'Template erstellt'),
-            ),
-          );
+          SnackbarUtils.showSuccess(context, isEditing ? 'Template aktualisiert' : 'Template erstellt');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.toString())),
-          );
+          SnackbarUtils.showError(context, e.toString());
         }
       }
     }

@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../../../friend/domain/entities/friend_template.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 
 /// Dialog for creating/editing a custom field
 class CustomFieldEditorDialog extends StatefulWidget {
@@ -122,12 +123,7 @@ class _CustomFieldEditorDialogState extends State<CustomFieldEditorDialog> {
             
         // This should be caught by validator, but double-check
         if (options.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Bitte mindestens eine Option angeben'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          SnackbarUtils.showError(context, 'Bitte mindestens eine Option angeben');
           return;
         }
       }
@@ -150,12 +146,7 @@ class _CustomFieldEditorDialogState extends State<CustomFieldEditorDialog> {
       Navigator.pop(context);
     } catch (e) {
       // Show error if something goes wrong
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Fehler beim Speichern: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackbarUtils.showError(context, 'Fehler beim Speichern: ${e.toString()}');
     }
   }
   

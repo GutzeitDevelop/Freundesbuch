@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../core/services/location_service.dart';
 import '../../../../core/services/photo_service.dart';
@@ -253,6 +254,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
         // Show success notification
         final notificationService = ref.read(notificationServiceProvider);
         final l10n = AppLocalizations.of(context)!;
+        notificationService.setContext(context);
         notificationService.showSuccess(l10n.friendSaved);
         
         // Navigate appropriately
@@ -290,12 +292,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
       });
       
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${l10n.locationCaptured}: ${locationData.address ?? "GPS coordinates"}'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      SnackbarUtils.showSuccess(context, '${l10n.locationCaptured}: ${locationData.address ?? "GPS coordinates"}');
       
     } on LocationPermissionDeniedException catch (e) {
       if (!mounted) return;
@@ -1252,19 +1249,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
 
       // Show success message at top
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.photoCaptured),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(
-              top: 80,
-              left: 16,
-              right: 16,
-              bottom: MediaQuery.of(context).size.height - 140,
-            ),
-          ),
-        );
+        SnackbarUtils.showSuccess(context, l10n.photoCaptured);
       }
     } on PhotoPermissionDeniedException catch (_) {
       setState(() {
@@ -1343,19 +1328,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
 
       // Show success message at top
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.photoSelected),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(
-              top: 80,
-              left: 16,
-              right: 16,
-              bottom: MediaQuery.of(context).size.height - 140,
-            ),
-          ),
-        );
+        SnackbarUtils.showSuccess(context, l10n.photoSelected);
       }
     } on PhotoPermissionDeniedException catch (_) {
       setState(() {
@@ -1404,19 +1377,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
       _photoPath = null;
     });
     
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.removePhoto),
-        backgroundColor: Colors.orange,
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(
-          top: 80,
-          left: 16,
-          right: 16,
-          bottom: MediaQuery.of(context).size.height - 140,
-        ),
-      ),
-    );
+    SnackbarUtils.showInfo(context, AppLocalizations.of(context)!.removePhoto);
   }
 
   /// Shows error dialog with optional settings navigation
